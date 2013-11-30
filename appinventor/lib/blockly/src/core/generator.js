@@ -162,9 +162,17 @@ Blockly.CodeGenerator.prototype.blockToCode = function(block) {
   var code = func.call(block);
   if (code instanceof Array) {
     // Value blocks return tuples of code and operator order.
-    return [this.scrub_(block, code[0]), code[1]];
+    //[12.2.13] added augment tag to keep track of block id when yail is sent to device
+    var result = [this.scrub_(block, "(augment " + block.id + " " + code[0] + ")"), code[1]];
+    //console.log("Output code: [" + result + "]");
+    return result;
+    //return ["(augment " + block.id + " " + (this.scrub_(block, code[0])) + ")", code[1]];
   } else {
-    return this.scrub_(block, code);
+    //console.log("Input code " + code);
+    // console.log("scrub " + this.scrub_(block, code));
+    var result = this.scrub_(block, "(augment " + block.id + " " + code + ")");
+    //console.log("Output code " + result);
+    return result;
   }
 };
 

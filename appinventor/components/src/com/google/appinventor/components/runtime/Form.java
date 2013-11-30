@@ -148,6 +148,7 @@ public class Form extends Activity
 
   // To control volume of error complaints
   private static long minimumToastWait = 10000000000L; // 10 seconds
+  //private static long minimumToastWait = 5000000000L; // 5 seconds
   private long lastToastTime = System.nanoTime() - minimumToastWait;
 
   // In a multiple screen application, when a secondary screen is opened, nextFormName is set to
@@ -1341,11 +1342,15 @@ public class Form extends Activity
   // hand, e.g. if triggered by Accelerometer.
   protected boolean toastAllowed() {
     long now = System.nanoTime();
+    boolean result = false;
     if (now > lastToastTime + minimumToastWait) {
       lastToastTime = now;
-      return true;
-    }
-    return false;
+      result = true;
+    }else{
+     result =  false;
+   }
+    Log.i("TOAST", now + " " + lastToastTime + " " + result);
+    return result;
   }
 
   // This is used by runtime.scm to call the Initialize of a component.

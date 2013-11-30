@@ -63,13 +63,15 @@ public class RetValManager {
     }
   }
 
-  public static void sendError(String error) {
+  public static void sendError(String error, String blockid) { 
+    //[12.2.13] Johanna added blockid to send error message to block
     synchronized (semaphore) {
       JSONObject retval = new JSONObject();
       try {
         retval.put("status", "OK");
         retval.put("type", "error");
         retval.put("value", error);
+        retval.put("blockid", blockid);
       } catch (JSONException e) {
         Log.e(LOG_TAG, "Error building retval", e);
         return;
