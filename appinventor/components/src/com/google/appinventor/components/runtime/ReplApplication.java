@@ -30,7 +30,7 @@ import org.acra.annotation.*;
 @ReportsCrashes(formKey="")
 public class ReplApplication extends Application {
 
-  private boolean active = true; //JOHANNA
+  private boolean active = false; 
   private static ReplApplication thisInstance;
 
   @Override
@@ -53,16 +53,6 @@ public class ReplApplication extends Application {
 
   public static void reportError(Throwable ex) {
     if (thisInstance != null && thisInstance.active){
-      Log.i("ReplApplication", "REPORT ERROR " + ex);
-      ACRA.getErrorReporter().handleException(ex);
-    }
-  }
-
-
-    public static void reportError(Throwable ex, String schemeCode) {
-    if (thisInstance != null && thisInstance.active){
-      Log.i("ReplApplication", "REPORT ERROR " + ex);
-      ACRA.getErrorReporter().putCustomData("myVariable", schemeCode);
       ACRA.getErrorReporter().handleException(ex);
     }
   }
