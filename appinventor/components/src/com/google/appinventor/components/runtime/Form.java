@@ -12,6 +12,7 @@ package com.google.appinventor.components.runtime;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,6 +165,26 @@ public class Form extends Activity
 
   private FullScreenVideoUtil fullScreenVideoUtil;
 
+  public static boolean useScreenSize = false; // Temporary hack to let people test measurements
+                                               // against screen size instead of container size
+
+  public static class PercentStorageRecord {
+    public enum Dim {
+      HEIGHT, WIDTH };
+
+    public PercentStorageRecord(AndroidViewComponent component, int length, Dim dim) {
+      this.component = component;
+      this.length = length;
+      this.dim = dim;
+    }
+
+    AndroidViewComponent component;
+    int length;
+    Dim dim;
+  }
+  private ArrayList<PercentStorageRecord> dimChanges = new ArrayList();
+
+
   @Override
   public void onCreate(Bundle icicle) {
     // Called when the activity is first created
@@ -247,6 +268,18 @@ public class Form extends Activity
             }
           }
           if (dispatchEventNow) {
+            ReplayFormOrientation(); // Re-do Form layout because percentage code
+                                     // needs to recompute objects sizes etc.
+            final FrameLayout savedLayout = frameLayout;
+            androidUIHandler.postDelayed(new Runnable() {
+                public void run() {
+                  if (frameLayout != null) {
+                    frameLayout.invalidate();
+                  }
+                }
+              }, 100);          // Redraw the whole screen in 1/10 second
+                                // we do this to avoid screen artifacts left
+                                // left by the Android runtime.
             ScreenOrientationChanged();
           } else {
             // Try again later.
@@ -347,6 +380,26 @@ public class Form extends Activity
     for (Integer key : keysToDelete) {
       activityResultMap.remove(key);
     }
+  }
+
+  void ReplayFormOrientation() {
+    // We first make a copy of the existing dimChanges list
+    // because while we are replaying it, it is being appended to
+    ArrayList<PercentStorageRecord> temp = (ArrayList<PercentStorageRecord>) dimChanges.clone();
+    dimChanges.clear();         // Empties it out
+    for (int i = 0; i < temp.size(); i++) {
+      // Iterate over the list...
+      PercentStorageRecord r = temp.get(i);
+      if (r.dim == PercentStorageRecord.Dim.HEIGHT) {
+        r.component.Height(r.length);
+      } else {
+        r.component.Width(r.length);
+      }
+    }
+  }
+
+  public void registerPercentLength(AndroidViewComponent component, int length, PercentStorageRecord.Dim dim) {
+    dimChanges.add(new PercentStorageRecord(component, length, dim));
   }
 
   private static int generateNewRequestCode() {
@@ -1178,13 +1231,49 @@ public class Form extends Activity
   }
 
   @Override
-  public void setChildWidth(AndroidViewComponent component, int width) {
+  public void setChildWidth(final AndroidViewComponent component, int width) {
+    int cWidth = Width();
+    if (cWidth == 0) {          // We're not really ready yet...
+      final int fWidth = width;
+      androidUIHandler.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            System.err.println("(Form)Width not stable yet... trying again");
+            setChildWidth(component, fWidth);
+          }
+        }, 100);                // Try again in 1/10 of a second
+    }
+    System.err.println("Form.setChildWidth(): width = " + width + " parent Width = " + cWidth + " child = " + component);
+    if (width <= LENGTH_PERCENT_TAG) {
+      width = cWidth * (- (width - LENGTH_PERCENT_TAG)) / 100;
+//      System.err.println("Form.setChildWidth(): Setting " + component + " lastwidth to " + width);
+    }
+
+    component.setLastWidth(width);
+
     // A form is a vertical layout.
     ViewUtil.setChildWidthForVerticalLayout(component.getView(), width);
   }
 
   @Override
-  public void setChildHeight(AndroidViewComponent component, int height) {
+  public void setChildHeight(final AndroidViewComponent component, int height) {
+    int cHeight = Height();
+    if (cHeight == 0) {         // Not ready yet...
+      final int fHeight = height;
+      androidUIHandler.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            System.err.println("(Form)Height not stable yet... trying again");
+            setChildHeight(component, fHeight);
+          }
+        }, 100);                // Try again in 1/10 of a second
+    }
+    if (height <= LENGTH_PERCENT_TAG) {
+      height = Height() * (- (height - LENGTH_PERCENT_TAG)) / 100;
+    }
+
+    component.setLastHeight(height);
+
     // A form is a vertical layout.
     ViewUtil.setChildHeightForVerticalLayout(component.getView(), height);
   }
@@ -1400,7 +1489,9 @@ public class Form extends Activity
     viewLayout.getLayoutManager().removeAllViews();
     // Set all screen properties to default values.
     defaultPropertyValues();
+    useScreenSize = false;
     screenInitialized = false;
+    dimChanges.clear();
   }
 
   public void deleteComponent(Object component) {
@@ -1474,6 +1565,21 @@ public class Form extends Activity
       Log.i(LOG_TAG, "invoke exception: " + e.getMessage());
       throw e.getTargetException();
     }
+  }
+
+  /**
+   * Determines whether or not percentages are against the Screen
+   * Size or the size of the parent.
+   *
+   * @param useScreenSize true if use screen based percentage
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+    defaultValue= "False")
+  @SimpleProperty(userVisible = false,
+    description = "Set this to true to cause percentage measurements to be measured "
+    + "against the size of the screen instead of the size of the parent container.")
+  public void UseScreenSize(boolean useScreenSize) {
+    this.useScreenSize = useScreenSize;
   }
 
   /**
