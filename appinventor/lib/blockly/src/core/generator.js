@@ -62,6 +62,41 @@ Blockly.Generator.prototype.INFINITE_LOOP_TRAP = null;
 Blockly.Generator.prototype.STATEMENT_PREFIX = null;
 
 /**
+ * appinvenotr/lib/blockly/src/core/generator.js
+ * @param {Blockly.Block} block The block to generate code for.
+ * @return {String|!Array} For statement blocks, the gernated code.
+ *  For value blocks, an array containing the generated code and an operator 
+ *  order value. Returns '' if block is null.
+ * Johanna: added augment tag and block ID
+ */
+ Blockly.CodeGenerator.prototype.blockToCode = function(block) {
+  if (!block) {
+    return '';
+  }
+  if (block.disabled) {
+    //Skip past this block if it is disabled.
+    var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+    return this.blockToCode(nextBlock);
+  }
+
+  var func = this[block.type];
+  if (!func) {
+    throw 'Language "' + this.name_ + '" does not know how to generate code ' + 
+      'for block type "' + block.type + '".';
+  }
+  var code = func.call(block);
+  if (code instanceof Array) {
+    //Value blocks return tuples of code and operator order.
+    //[12.2.13] added augment tag to keep trac of block id when yail is sent to device
+    var result = [this.scrub_(block, "(augment " + block.id + " " + code[0] + ")"), code[1]];
+    return result;
+  } else {
+    var result = this.scrub_(block, "(augment " + block.id + " " + code + ")");
+    return result;
+  }
+ };
+
+/**
  * Generate code for all blocks in the workspace to the specified language.
  * @return {string} Generated code.
  */

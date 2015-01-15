@@ -43,7 +43,7 @@ Blockly.Blocks['controls_if'] = {
   helpUrl: Blockly.Msg.LANG_CONTROLS_IF_HELPURL,
   init: function () {
     this.setColour(Blockly.CONTROL_CATEGORY_HUE);
-    this.appendValueInput('IF0')
+    this.appendValueInput('IF0') 
         .setCheck(Blockly.Blocks.Utilities.YailTypeToBlocklyType("boolean", Blockly.Blocks.Utilities.INPUT))
         .appendField(Blockly.Msg.LANG_CONTROLS_IF_MSG_IF);
     this.appendStatementInput('DO0')

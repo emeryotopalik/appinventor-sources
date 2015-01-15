@@ -2301,6 +2301,61 @@ list, use the make-yail-list constructor with no arguments.
                              "NOK"
                              (exception:getMessage)))))))))
 
+;; watch it block
+;; Johanna
+(define-syntax watch
+  (syntax-rules ()
+    ((_ info exp)
+      (let ((result exp))
+        (send-to-block info (list "OK" result))
+        result))))
+
+;;Johanna
+;;appinventor/buildserver/src/com/google/appinventor/buildserver/resources/runtime.src
+;;(On the device)
+;;Augment: keep track of block ID currently executed block
+(define-syntax augment
+  (syntax-rules()
+    ((_ info exp)
+      (let ((ans (with-current-block-id info (lambda () exp))))
+        (after-execution info)
+      ans))))
+
+;;Johanna
+;;appinventor/buildserver/src/com/google/appinventor/buildserver/resources/runtime.scm
+;;(On the device)
+;;Check to see if block had previously generated error
+;;If so, remove error.
+(define (after-execution block-id)
+  (if (member block-id (*:get-blocks-with-errors *this-form*))
+    (begin (send-to-block block-id (list "OK" "noError")) ;; Alert Blocks Editor that the error occurred
+      (*:remove-from-last-block-with-error *this-form* block-id) ;;No longer has to count this error
+      (*:remove-from-errors *this-form* block-id))) ;;Block is no longer flagged as an error
+  )
+
+;;Johanna
+;;appinventor/buildserver/src/com/google/appinventor/buildserver/resources/runtime.scm
+;;(On the device)
+;;Keep track of block id of currently executed code
+(define (with-current-block-id block-id thunk)
+  (let ((old-block-id (*:get-current-block-id *this-form*)))
+    (*:set-current-block-id *this-form* block-id)
+    (let ((result (thunk)))
+      (*:set-current-block-id *this-form* old-block-id) ;;Reset block-id to remembered value
+      result)))
+
+;;Johanna
+;;appinventor/buildserver/src/com/google/appinventor/buildserver/resources/runtime.scm
+;;Calls sendError(String error, String blockid)
+(define (send-error error)
+  (add-to-blocks-with-errors current-block-id)
+  (let ((ans (add-to-blocks-plus-errors current-block-id error blocks-plus-errors)))
+    (if (or (equal? ans "newError") (equal? ans "newBlock")) ;;only send error to blocks editor
+      (com.google.appinventor.components.runtime.util.RetValManager: sendError error current-block-id)
+      (let ((count (cadr ans)))
+        (if (or (equal? count 50) (equal? (modulo count 100) 0)) ;; send if equal to 50 or 100
+          (string-append error " (This error has occured " (number->string count) " + times.)"))))))
+
 ;; send-to-block is used for all communication back to the blocks editor
 ;; Calls on report are also generated for code from the blocks compiler
 ;; when a block is being watched.

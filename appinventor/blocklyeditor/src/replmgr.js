@@ -541,7 +541,11 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                 if (r.status == "OK") {
                     block.replError = null;
                     if (r.value && (r.value != '*nothing*')) {
-                        this.setDoitResult(block, r.value);
+                        if (block.watch) {
+                            this.appendToWatchResult(block, r.value);
+                        } else {
+                            this.setDoitResult(block, r.value); 
+                        }
                     }
                 } else {
                     if (r.value) {
@@ -563,7 +567,39 @@ Blockly.ReplMgr.processRetvals = function(responses) {
             window.parent.BlocklyPanel_popScreen();
             break;
         case "error":
-            console.log("processRetVals: Error value = " + r.value);
+            console.log("Blockly.ReplMgr.process.Retvals: error for block " + r.blockid);
+            //Johanna
+            if (r.blockid != -1) {
+                block = Blockls.mainWorkspace.getBlockById(r.blockid);
+                block.replError = "Error from Companion: " + r.value;
+
+                block.setErrorIconText("Error from Companion " + r.value);
+                var rootBlock;
+                var current = block;
+                do {
+                    //uncollapse collapsed blocks
+                    if (current.collapsed) {
+                        current.setCollapsed(false);
+                    }
+                    rootBlock = current;
+                    current = rootBlock.parentBlock_;
+                } while (current);
+                block.errorIcon.setVisible(true);
+            
+            } else { // Not associated with particular block; put up Jeff's dialog
+                if (!this.runtimeError) {
+                    this.runtimeError = new goog.ui.Dialog(null, true);
+                }
+                if (this.runtimeError.isVisible()) {
+                    this.runtimeError.setVisible(false);
+                }
+                this.runtimeError.setTitle("Runtime Error");
+                this.runtimeError.setButtonSet(new goog.ui.Dialog.ButtonSet().
+                    addButton({caption:"Dismiss"}, false, true));
+                this.runtimeError.setContent(r.value + "<br/><i>Note:</i>&nbsp;You will not see...");
+                this.runtimeError.setVisible(true);
+                }
+            console.log("processRetVals: Error value = " + r.value);    
             runtimeerr(escapeHTML(r.value) + Blockly.Msg.REPL_NO_ERROR_FIVE_SECONDS);
         }
     }
@@ -593,6 +629,55 @@ Blockly.ReplMgr.setDoitResult = function(block, value) {
     }
     block.setCommentText(comment);
     block.comment.setVisible(true);
+};
+
+//Bach
+Blockly.ReplMgr.appendToWatchResult = function(block, value) {
+    var comment = "";
+    if (block.comment) {
+        comment = block.comment.getText();
+    }
+    comment = value + "\n" + comment;
+    if (block.comment) {
+        block.comment.setVisible(false);
+    }
+    block.setCommentText(comment);
+    block.comment.setVisible(true);
+}
+
+// Added watch tag during YAIL code gernation
+//Bach
+
+Blockly.CodeGenerator.prototype.blockToCode = function(block) {
+    if (!block) {
+        return '';
+    }
+    if (block.disabled) {
+        //Skip past this block if it is disabled.
+        var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+        return this.blockToCode(nextBlock);
+    }
+
+    var func = this[block.type];
+    if (!func) {
+        throw 'Language "' + this.name_ + '" does not know how to gernate code ' 
+            + 'for block type "' + block.type + '".';
+    }
+    var code = func.call(block);
+    if (code instanceof Array) {
+        if (block.watch) {
+            var result = [this.scrub_(block, "(augment " + block.id + " (watch " + block.id + " " 
+                + code[0] + ")"), code[1]];
+                return result;
+        } else {
+            // Value blocks return tuples of code and operator order.
+            var result = [this.scrub_(block, "(augment " + block.id + " " + code[0] + ")"), code[1]];
+            return result;
+        }
+    } else {
+        result = this.scrub_(block, "(augment " + block.id + " " + code + ")");
+        return result;
+    }
 };
 
 Blockly.ReplMgr.startAdbDevice = function(rs, usb) {

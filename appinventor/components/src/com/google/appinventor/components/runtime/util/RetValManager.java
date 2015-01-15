@@ -36,6 +36,31 @@ public class RetValManager {
   private RetValManager() {
   }
 
+  //Johanna
+  //appinventor/components/src/com/google/appinventor/components/runtime/util/RetValManager.java
+  //On Blocks editor side:
+  //Add arguement to sendError function for app on device to call
+  //Creates retval for type error
+  public static void sendError(String error, String blockid) {
+    synchronized (semaphore) {
+      JSONObject retval = new JSONObject();
+      try {
+        retval.put("status", "OK");
+        retval.put("type", "error");
+        retval.put("value", error);
+        retval.put("blockid", blockid);
+      } catch (JSONException e) {
+        Log.e(LOG_TAG, "Error building retval", e);
+        return;
+      }
+      boolean sendNotify = currentArray.isEmpty();
+      currentArray.add(retval);
+      if (sendNotify) {
+        semaphore.notifyAll();
+      }
+    }
+  }
+
   /*
    * appendReturnValue -- Add a result, already encoded as a String to
    * the array of pending values.
