@@ -536,6 +536,7 @@ Blockly.ReplMgr.processRetvals = function(responses) {
         console.log("processRetVals: " + JSON.stringify(r));
         switch(r.type) {
         case "return":
+            console.log("return case: r.blockid = " + r.blockid + "; r.status = " + r.status + "; r.value = " + r.value);
             if (r.blockid != "-1") {
                 block = Blockly.mainWorkspace.getBlockById(r.blockid);
                 if (r.status == "OK") {
