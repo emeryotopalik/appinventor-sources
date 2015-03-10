@@ -499,6 +499,20 @@
           ;;(android-log-form (format #f "(send-error '~A' ~A)" error current-block-id)) ;; [12/01/13, lyn]
           ;;(com.google.appinventor.components.runtime.util.RetValManager:sendError error current-block-id)) ;;johanna
 
+        ;; Johanna's partial implementation for better list displays in error messages
+    ;;    (define (better-list error)
+      ;;    (if (equal? (substring error 0 17) "Select list item:")
+        ;;    (let ((str (substring error 77))) ;;need to go to the end of string minus 1 to get rid of last paren
+          ;;    (let ((lst (string-split str)) ;; convert string to list based on spaces
+            ;;    (begin
+              ;;    (android-log-form lst)
+                ;;  (string-append (substring error 0 74) (string-append " [\"" (string-append
+                  ;;(list-ref 0 lst) (string-append "\",\"" (string-append (list-ref 1 lst) "\"].")))))
+                ;;)
+              ;;))
+            ;;))
+          ;;)
+
         (define (better-message error)
           (android-log-form "BETTER MESSAGE")
           (android-log-form error)
@@ -1240,15 +1254,29 @@
   (android-log (format #f "arglist is: ~A " arglist))
   (let ((string-name (coerce-to-string proc-name)))
     (signal-runtime-error
-     (string-append "The operation "
-                    string-name
-                    (format " cannot accept the argument~P: " (length arglist))
-                    (show-arglist-no-parens arglist))
+     (string-append "The operations "
+                    (string-append  string-name
+                    (format " cannot accept the argument~P: (" (length arglist))
+                    (show-arglist-no-parens arglist) ")")) ;EMERY
      (string-append "Bad arguments to " string-name))))
 
 (define (show-arglist-no-parens args)
   (let ((s (get-display-representation args)))
     (substring s 1 (- (string-length s) 1))))
+
+;; Johanna's partial implementation for better list displays in error messages
+    ;;    (define (better-list error)
+      ;;    (if (equal? (substring error 0 17) "Select list item:")
+        ;;    (let ((str (substring error 77))) ;;need to go to the end of string minus 1 to get rid of last paren
+          ;;    (let ((lst (string-split str)) ;; convert string to list based on spaces
+            ;;    (begin
+              ;;    (android-log-form lst)
+                ;;  (string-append (substring error 0 74) (string-append " [\"" (string-append
+                  ;;(list-ref 0 lst) (string-append "\",\"" (string-append (list-ref 1 lst) "\"].")))))
+                ;;)
+              ;;))
+            ;;))
+          ;;)
 
 ;;; Coerce the list of args to the corresponding list of types
 
@@ -1361,10 +1389,10 @@
             ((eq? arg *the-null-value*) *the-null-value-printed-rep*)
             ((symbol? arg)
              (symbol->string arg))
-            ((string? arg)
+            ((string? arg )
              (if (string=? arg "")
                  *the-empty-string-printed-rep*
-                 arg))
+                 (string-append "\"" (string-append arg "\"")))) ;EMERY
             ((number? arg) (appinventor-number->string arg))
             ((boolean? arg) (boolean->string arg))
             ((yail-list? arg) (get-display-representation (yail-list->kawa-list arg)))
