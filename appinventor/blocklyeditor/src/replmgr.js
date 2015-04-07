@@ -28,6 +28,8 @@ goog.require('goog.crypt.Sha1');
 goog.require('goog.crypt.Hmac');
 goog.require('goog.crypt.base64');
 
+top.loadAll = true;             // Global for debugging!
+
 // Repl State
 // Repl "state" definitions
 
@@ -247,10 +249,10 @@ Blockly.ReplMgr.putYail = (function() {
                 engine.receivefromphone();
             }
             var work = rs.phoneState.phoneQueue.shift();
-            if (!work) {
-                rs.phoneState.ioRunning = false;
-                return;
-            }
+                if (!work) {
+                    rs.phoneState.ioRunning = false;
+                    return;
+                }
             var encoder = new goog.Uri.QueryData();
             conn = goog.net.XmlHttp();
             var blockid;
