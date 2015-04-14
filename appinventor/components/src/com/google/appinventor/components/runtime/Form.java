@@ -167,6 +167,7 @@ public class Form extends Activity
 
   public static boolean useScreenSize = false; // Temporary hack to let people test measurements
                                                // against screen size instead of container size
+  //public static boolean useJSONDisplay = true; //Emery: for switching between list representations in displays
 
   public static class PercentStorageRecord {
     public enum Dim {
@@ -1491,6 +1492,7 @@ public class Form extends Activity
     defaultPropertyValues();
     useScreenSize = false;
     screenInitialized = false;
+   // useJSONDisplay = true; //Emery
     dimChanges.clear();
   }
 
@@ -1582,6 +1584,20 @@ public class Form extends Activity
     this.useScreenSize = useScreenSize;
   }
 
+    /**
+     * Determines whether or not to use JSON representation or the old
+     * representation in lists. Default is true.
+     *
+     * @param useJSONDisplay true if JSON Display is used
+     */
+
+   /* @DesignerProperty(EditorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "True")
+    @SimpleProperty(userVisible = false, description = "Set this to true to use the JSON representation of lists.")
+    public void UseJSONDisplay (boolean useJSONDisplay)   {
+     this.useJSONDisplay = useJSONDisplay;
+    }*/
+  }
+
   /**
    * Perform some action related to fullscreen video display.
    * @param action
@@ -1619,3 +1635,4 @@ public class Form extends Activity
     return fullScreenVideoUtil.performAction(action, source, data);
   }
 }
+
