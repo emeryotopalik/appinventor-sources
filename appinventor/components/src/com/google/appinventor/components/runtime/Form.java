@@ -163,7 +163,7 @@ public class Form extends Activity
 
   private FullScreenVideoUtil fullScreenVideoUtil;
 
-    //public static boolean useJSONDisplay = true; //EMERY use JSON representation for lists
+   // public static boolean useJSONDisplay = true; //EMERY use JSON representation for lists
 
   @Override
   public void onCreate(Bundle icicle) {
@@ -1468,13 +1468,13 @@ public class Form extends Activity
      *
      * @param useJSONDisplay true if use JSON Display for lists
      */
-    /*@DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+  /*  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
             defaultValue= "True")
     @SimpleProperty(userVisible = false,
             description = "Set this to use JSON Display Representation for lists.")
     public void UseJSONDisplay (boolean useJSONDisplay) {
-        this.useJSONDisplay = useJSONDisplay;
-    }   */
+        this.useJSONDisplay = useJSONDisplay;     */
+    }
 
   /**
    * Perform some action related to fullscreen video display.
