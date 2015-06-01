@@ -1410,10 +1410,17 @@
 ;;; be explicity shown in error messages.
 ;;; This procedure is currently almost completely redundant with coerce-to-string
 ;;; but it give us flexibility to tailor display for other data types
- (define get-display-representation 
+ (define get-display-representation
    (lambda (arg) (get-json-display-representation arg))
     ;;(lambda (arg) (get-original-display-representation arg))
+    ;;(if (equal? (lambda (arg) (get-display-type)) true)
+         ;; (lambda (arg) (get-json-display-representation arg))
+          ;; (lambda (arg) (get-original-display-representation arg))
  )
+
+ (define get-display-type
+    ;; method for returning boolean of display type from Form
+    )
 
 (define get-json-display-representation
   ;; there seems to be a bug in Kawa that makes (/ -1 0) equal to (/ 1 0)
