@@ -2540,8 +2540,8 @@ list, use the make-yail-list constructor with no arguments.
                (send-to-block blockid
                 (try-catch
                  (try-catch
-                  ((list "OK"
-                        (get-display-representation (force promise))))
+                  (list "OK"
+                        (get-display-representation (force promise)))
                   (exception YailRuntimeError
                              (android-log (exception:getMessage))
                              (list "NOK"
