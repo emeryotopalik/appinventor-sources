@@ -578,7 +578,11 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                 if (r.status == "OK") {
                     block.replError = null;
                     if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
-                        this.setDoitResult(block, r.value);
+                        if (block.watch) { //JOHANNA
+                            this.appendToWatchResult(block, r.value);
+                        } else {
+                            this.setDoitResult(block, r.value);
+                        }
                     }
                 } else {
                     if (r.value) {
@@ -639,6 +643,22 @@ Blockly.ReplMgr.processRetvals = function(responses) {
     }
     Blockly.WarningHandler.checkAllBlocksForWarningsAndErrors();
 };
+
+Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
+    var comment = "";
+    if (block.comment) {
+        comment = block.comment.getText();
+    }
+    // This version adds at beginning:
+    //     comment = value + "\n" + comment;
+    // This version adds at end:
+    comment = comment + value + "\n"
+    if (block.comment) {
+        block.comment.setVisible(false);
+    }
+    block.setCommentText(comment);
+    block.comment.setVisible(true);
+}
 
 Blockly.ReplMgr.setDoitResult = function(block, value) {
     var patt = /Do It Result:.*?\n---\n/m;
