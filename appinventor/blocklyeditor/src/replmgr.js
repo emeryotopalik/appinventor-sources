@@ -544,10 +544,10 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                     if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
                         if (block.watch) { //JOHANNA
                             this.appendToWatchResult(block, r.value);
-                        } else {
-                            this.setDoitResult(block, r.value);
+                        } else { // need a way to differentiate between doit and end watch
+                                this.setDoitResult(block, r.value);
+                            }
                         }
-                    }
                 } else {
                     if (r.value) {
                         block.replError = Blockly.Msg.REPL_ERROR_FROM_COMPANION + ": " + r.value;
@@ -622,6 +622,7 @@ Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
     }
     block.setCommentText(comment);
     block.comment.setVisible(true);
+    console.log("WATCH HERE"); //EMERy
 }
 
 Blockly.ReplMgr.setDoitResult = function(block, value) {
@@ -647,6 +648,8 @@ Blockly.ReplMgr.setDoitResult = function(block, value) {
     }
     block.setCommentText(comment);
     block.comment.setVisible(true);
+    console.log("DO IT HERE"); // EMERY
+
 };
 
 Blockly.ReplMgr.startAdbDevice = function(rs, usb) {

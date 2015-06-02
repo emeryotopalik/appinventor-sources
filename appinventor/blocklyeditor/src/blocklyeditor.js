@@ -166,9 +166,12 @@ Blockly.BlocklyEditor.render = function() {
  * the bubble for "do it" output once we hook up to the REPL.
  */
 Blockly.Block.prototype.customContextMenu = function(options) {
+
   var myBlock = this;
-  var doitOption = { enabled: this.disabled?false : true};
+
+  var doitOption = {enabled: this.disabled?false : true};
   var watchOption = {enabled: this.disabled?false : true}; //JOHANNA
+
   if (window.parent.BlocklyPanel_checkIsAdmin()) {
     var yailOption = {enabled: this.disabled?false : true};
     yailOption.text = Blockly.Msg.GENERATE_YAIL;
@@ -186,6 +189,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
     };
     options.push(yailOption);
   }
+
   doitOption.text = Blockly.Msg.DO_IT;
   doitOption.callback = function() {
     var yailText;
@@ -211,24 +215,52 @@ Blockly.Block.prototype.customContextMenu = function(options) {
     }
   };
   options.push(doitOption);
-  watchOption.text = "Watch"; //JOHANNA
-  watchOption.callback = function() {
+
+
+  /*if (myBlock.watch == true) {
+    var endWatchOption = {enabled: this.disabled?false : true}; //Emery
+    endWatchOption.text = Blockly.Msg.END_WATCH; //Emery
+    endWatchOption.callback = function() {
+      myBlock.watch = false;
+      console.log("END WATCH");
+    }
+    options.push(endWatchOption);
+  }   */
+
+  watchOption.text = Blockly.Msg.WATCH; //JOHANNA
+  watchOption.callback = function() {     // check to see if connected like in do it?
     var yailText;
     var yailTextOrArray = Blockly.Yail.blockToCode(myBlock);
-    if(yailTextOrArray instanceof Array){
-      yailText = yailTextOrArray[0];
+    var dialog;
+    if (window.parent.ReplState.state != Blockly.ReplMgr.rsState.CONNECTED) {  //Emery (like above)
+      dialog = new goog.ui.Dialog(null, true);
+      dialog.setTitle(Blockly.Msg.CAN_NOT_WATCH);
+      dialog.setContent(Blockly.Msg.CONNECT_TO_WATCH);
+      dialog.setButtonSet(new goog.ui.Dialog.ButtonSet().
+          addButton(goog.ui.Dialog.ButtonSet.DefaultButtons.OK,
+          false, true));
+      dialog.setVisible(true);
     } else {
-      yailText = yailTextOrArray;
+      if (yailTextOrArray instanceof Array) {
+        yailText = yailTextOrArray[0];
+      } else {
+        yailText = yailTextOrArray;
+      }
+      console.log("WATCH");
+      console.log(yailText);
+      //var watchYail = "(watch " + yailText + ")";
+      myBlock.watch = true;
+      //myBlock.replError = "(watch)";
+      myBlock.setCommentText(""); // resetting to blank before setting to updated list
+      Blockly.ReplMgr.putYail(yailText);
     }
-    console.log("WATCH");
-    console.log(yailText);
-    //var watchYail = "(watch " + yailText + ")";
-    myBlock.watch = true;
-    //myBlock.replError = "(watch)";
-    myBlock.setCommentText("");
-    Blockly.ReplMgr.putYail(yailText);
   };
   options.push(watchOption);
+
+
+
+
+
   if(myBlock.procCustomContextMenu){
     myBlock.procCustomContextMenu(options);
   }

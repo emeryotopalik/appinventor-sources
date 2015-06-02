@@ -1310,6 +1310,10 @@ Blockly.Msg.en.switch_language_to_english = {
     Blockly.Msg.DO_IT = "Do It";
     Blockly.Msg.CAN_NOT_DO_IT = "Cannot Do it";
     Blockly.Msg.CONNECT_TO_DO_IT = 'You must be connected to the companion or emulator to use "Do It"';
+    Blockly.Msg.WATCH = "Watch"; // EMERY
+    Blockly.Msg.CAN_NOT_WATCH = "Cannot Watch";
+    Blockly.Msg.CONNECT_TO_WATCH = 'You must be connected to the companion or emulator to use "Watch"';
+    Blockly.Msg.END_WATCH = "End Watch";
   }
 };
 
