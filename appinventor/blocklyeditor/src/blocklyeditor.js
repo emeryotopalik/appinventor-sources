@@ -192,6 +192,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
 
   doitOption.text = Blockly.Msg.DO_IT;
   doitOption.callback = function() {
+    myBlock.watch = false; //Emery
     var yailText;
     //Blockly.Yail.blockToCode1 returns a string if the block is a statement
     //and an array if the block is a value
@@ -217,22 +218,23 @@ Blockly.Block.prototype.customContextMenu = function(options) {
   options.push(doitOption);
 
 
-  /*if (myBlock.watch == true) {
+  if (myBlock.watch == true) {
     var endWatchOption = {enabled: this.disabled?false : true}; //Emery
     endWatchOption.text = Blockly.Msg.END_WATCH; //Emery
     endWatchOption.callback = function() {
       myBlock.watch = false;
       console.log("END WATCH");
     }
+    Blockly.ReplMgr.putYail();
     options.push(endWatchOption);
-  }   */
+  }
 
   watchOption.text = Blockly.Msg.WATCH; //JOHANNA
   watchOption.callback = function() {     // check to see if connected like in do it?
     var yailText;
     var yailTextOrArray = Blockly.Yail.blockToCode(myBlock);
     var dialog;
-    if (window.parent.ReplState.state != Blockly.ReplMgr.rsState.CONNECTED) {  //Emery (like above)
+    if (window.parent.ReplState.state != Blockly.ReplMgr.rsState.CONNECTED) {  //Emery (like above for doit)
       dialog = new goog.ui.Dialog(null, true);
       dialog.setTitle(Blockly.Msg.CAN_NOT_WATCH);
       dialog.setContent(Blockly.Msg.CONNECT_TO_WATCH);
@@ -252,7 +254,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
       myBlock.watch = true;
       //myBlock.replError = "(watch)";
       myBlock.setCommentText(""); // resetting to blank before setting to updated list
-      Blockly.ReplMgr.putYail(yailText);
+      Blockly.ReplMgr.putYail(yailText, myBlock);
     }
   };
   options.push(watchOption);

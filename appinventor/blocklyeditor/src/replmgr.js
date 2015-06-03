@@ -581,6 +581,9 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                         if (block.watch) { //JOHANNA
                             this.appendToWatchResult(block, r.value);
                         } else { // need a way to differentiate between doit and end watch
+                            /* if (end watch) {
+                                //do nothing or set endwatch
+                            } else {*/
                                 this.setDoitResult(block, r.value);
                             }
                         }
@@ -643,6 +646,7 @@ Blockly.ReplMgr.processRetvals = function(responses) {
     }
     Blockly.WarningHandler.checkAllBlocksForWarningsAndErrors();
 };
+
 
 Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
     var comment = "";
