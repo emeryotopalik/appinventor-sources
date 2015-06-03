@@ -224,8 +224,9 @@ Blockly.Block.prototype.customContextMenu = function(options) {
     endWatchOption.callback = function() {
       myBlock.watch = false;
       console.log("END WATCH");
+      //watchOption = {enabled: this.disabled?false : false};
+     // Blockly.ReplMgr.putYail("End Watch");
     }
-    Blockly.ReplMgr.putYail();
     options.push(endWatchOption);
   }
 

@@ -657,12 +657,12 @@ Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
     //     comment = value + "\n" + comment;
     // This version adds at end:
     comment = comment + value + "\n"
-    if (block.comment) {
-        block.comment.setVisible(false);
-    }
+    // we don't want this because it resets the box every time, which is annoying and unusable.[Emery]
+   // if (block.comment) {
+     //   block.comment.setVisible(false);
+    //}
     block.setCommentText(comment);
     block.comment.setVisible(true);
-    console.log("WATCH HERE"); //EMERy
 }
 
 Blockly.ReplMgr.setDoitResult = function(block, value) {
@@ -682,14 +682,12 @@ Blockly.ReplMgr.setDoitResult = function(block, value) {
         }
     }
     // If we don't set visible to false, the comment
-    // doesn't always change when it should...
-    if (block.comment) {
-        block.comment.setVisible(false);
-    }
+    // doesn't always change when it should... this isn't true... as of now at least. [Emery]
+   // if (block.comment) {
+     //   block.comment.setVisible(false);
+    //}
     block.setCommentText(comment);
     block.comment.setVisible(true);
-    console.log("DO IT HERE"); // EMERY
-
 };
 
 Blockly.ReplMgr.startAdbDevice = function(rs, usb) {
