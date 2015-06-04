@@ -19,7 +19,7 @@
 ;;;
 
 ;;; also see *debug-form* below
-(define *debug* #f)
+(define *debug* #t)
 
 (define *this-is-the-repl* #f)
 
@@ -295,7 +295,7 @@
        (module-static form-name)
        (require <com.google.youngandroid.runtime>)
 
-       (define *debug-form* #f)
+       (define *debug-form* #t) ;;JOHANNA
 
        (define (android-log-form message)
          (when *debug-form* (android.util.Log:i "YAIL" message)))
@@ -376,17 +376,171 @@
                (cons thunk
                      form-do-after-creation)))
 
+       ;; Tracks the ID of the currently executing block (to assign blame in error messages).
+       ;; -1 means no block executing.
+       ;; Introduced by Johanna
+       ;; Moved here by lyn, who added ":: int" type spec
+       (define current-block-id -1)
+
+       (define (get-current-block-id)
+         current-block-id)
+
+       (define (set-current-block-id block-id)
+         (android-log-form (format #f "Before setting current-block-id to ~A its value is ~A and ~A" block-id current-block-id (get-current-block-id)))
+         (set! current-block-id block-id)
+         (android-log-form (format #f "After setting current-block-id to ~A its value is ~A and ~A" block-id current-block-id (get-current-block-id)))
+         )
+
+       ;; Keeps track of the last block that generated a runtime error
+       ;; in order to clear the message when the error is fixed
+       ;; [12.3.13] johanna
+       (define blocks-with-errors
+          (list))
+       (android-log-form "BLOCKS WITH ERRORS")
+
+       (define (get-blocks-with-errors)
+          blocks-with-errors)
+
+       (define (add-to-blocks-with-errors block-id)
+            (android-log-form "Adding error")
+            (android-log-form blocks-with-errors)
+            (if (not (member block-id blocks-with-errors))
+                (set! blocks-with-errors (cons block-id blocks-with-errors)))
+            (android-log-form blocks-with-errors))
+
+       ;; Johanna 1.7.14
+       ;; Remove all instances of elt from list.
+       (define (remove elt lst)
+        (if  (null? lst)
+          '()
+          (if (equal? (car lst) elt)
+            (remove elt (cdr lst))
+            (cons (car lst) (remove elt (cdr lst))))
+          ))
+
+       (define (remove-from-last-block-with-error block-id)
+              (set! blocks-with-errors (remove block-id blocks-with-errors)))
+
+       (define (remove-tuple block-id lst)
+        (android-log-form "remove-tuple")
+        (android-log-form block-id)
+          (if  (null? lst)
+          '()
+          (if (equal? (car (car lst)) block-id)
+            (begin
+              (android-log-form (car (car lst)))
+              (remove-tuple block-id (cdr lst)))
+            (cons (car lst) (remove-tuple block-id (cdr lst))))
+          ))
+
+       (define (remove-from-errors block-id)
+        (android-log-form "REMOVE FROM ERRORS")
+        ;;(android-log-form block-id)
+        ;;(android-log-form blocks-plus-errors)
+        (set! blocks-plus-errors (remove-tuple block-id blocks-plus-errors)))
+        ;;(android-log-form blocks-plus-errors))
+
+
+       (define blocks-plus-errors
+        ;; will be list of tuples: (block-id (error) count)
+        (list))
+
+        ;; Johanna 1.8.14
+        ;; iterate through blocks-plus-errors.
+        ;;
+       (define (add-to-blocks-plus-errors block-id error lst) ;; only calls this once and never again b/c line below
+        (android-log-form "BLOCKS PLUS ERRORS")
+        (let ((ans "-1"))
+          (if (null? lst) ;; block-id not in list. First time error has been generated.
+            (begin
+              (set! blocks-plus-errors (cons (list block-id (list error) 1) blocks-plus-errors))
+              (set! ans "newBlock")) ;; block has never had error before. send error to blocks editor
+            (if (equal? (car (car lst)) block-id) ;; block has had error- check if same or new error.
+              (begin
+                (android-log-form "same block")
+                (android-log-form (cadr (car lst)))
+                (if (equal? (car (cadr (car lst))) error) ;; error is the same
+                  (begin
+                    (let ((count (caddr (car lst)))) ;; increment error count
+                      (set! (caddr (car lst)) (+ count 1))
+                      (set! ans (list "repeatError" (+ count 1)))))
+                  (begin
+                    (set! ans "newError")
+                    (set! (car (cadr (car lst))) error) ;;set error and reset count to 1
+                    (set! (caddr (car lst)) 1))))
+              (set! ans (add-to-blocks-plus-errors block-id error (cdr lst)))))
+          (android-log-form "blocks plus errors")
+          (android-log-form blocks-plus-errors)
+          (android-log-form ans)
+          ans))
+
+       ;;(define (get-error-on-block block-id) ;; to be called in process-exception.
+       ;; (if (null?  ))
+
+
        (define (send-error error)
-         (com.google.appinventor.components.runtime.util.RetValManager:sendError error))
+          (android-log-form "SEND ERROR")
+          (android-log-form (better-message error))
+          (android-log-form "done")
+          (add-to-blocks-with-errors current-block-id)
+          (android-log-form blocks-plus-errors)
+          (let ((ans (add-to-blocks-plus-errors current-block-id error blocks-plus-errors)))
+            (android-log-form ans)
+            (if (or (equal? ans "newError") (equal? ans "newBlock")) ;;only send error to blocks editor if error is new
+              (begin
+                (android-log-form (format #f "(send-error '~A' ~A)" error current-block-id)) ;; [12/01/13, lyn]
+                (com.google.appinventor.components.runtime.util.RetValManager:sendError error current-block-id)) ;;johanna
+              (let ((count (cadr ans)))
+                (if (or (equal? count 50) (equal? (modulo count 100) 0)) ;; send if equal to 50 and multiples of 100.
+                  (com.google.appinventor.components.runtime.util.RetValManager:sendError
+                      (string-append error " (This error has occured " (number->string count) "+ times.)") current-block-id)
+                  (android-log-form "modulo no"))))))
+
+          ;;(android-log-form (format #f "(send-error '~A' ~A)" error current-block-id)) ;; [12/01/13, lyn]
+          ;;(com.google.appinventor.components.runtime.util.RetValManager:sendError error current-block-id)) ;;johanna
+
+        (define (better-message error)
+          (android-log-form "BETTER MESSAGE")
+          (android-log-form error)
+          (android-log-form (substring error 0 13))
+          (if (equal? (substring error 0 13) "The operation")
+            (let ((op (substring error 14 15)))
+            (begin
+              (android-log-form "YES")
+              (android-log-form (substring error 14 15))
+              (android-log-form (equal? (substring error 14 15) "+"))
+              (string-append error (string-append (string-append ". " (string-append (string-append "\"" op) "\" "))  "requires two integers as input and at least one of yours is the wrong type."))))
+
+            (android-log-form "no")))
+
+
+       (define (is-quick-fire-event eventName)
+         (or (string=? eventName "AccelerationChanged")
+          (string=? eventName "Shaking"))) ;; JOHANNA. would have more cases to test all types
+
+       (define (is-toast-allowed) ;; JOHANNA
+          ((this):toastAllowed))
 
        (define (process-exception ex)
          (define-alias YailRuntimeError <com.google.appinventor.components.runtime.errors.YailRuntimeError>)
          ;; The call below is a no-op unless we are in the wireless repl
          (com.google.appinventor.components.runtime.ReplApplication:reportError ex)
+         (android-log-form "PROCESS EXCEPTION")
+         (android-log-form ex)
          (if isrepl
-             (when ((this):toastAllowed)
-                   (begin (send-error (ex:getMessage))
-                          ((android.widget.Toast:makeText (this) (ex:getMessage) 5):show)))
+             (begin
+                (android-log-form get-blocks-with-errors)
+                (android-log-form blocks-with-errors)
+                (android-log-form current-block-id)
+                (android-log-form blocks-with-errors)
+                (android-log-form (member current-block-id blocks-with-errors))
+                ;;(if (not (member current-block-id blocks-with-errors))
+                ;;  (send-error (ex:getMessage)))
+                (send-error (ex:getMessage))
+                (when ((this):toastAllowed)
+                  ;;(send-error (ex:getMessage))
+                    ((android.widget.Toast:makeText (this) (ex:getMessage) 5):show))
+                )
 
              (com.google.appinventor.components.runtime.util.RuntimeErrorAlert:alert
               (this)
@@ -2316,6 +2470,71 @@ list, use the make-yail-list constructor with no arguments.
   (syntax-rules ()
     ((_ blockid expr)
      (in-ui blockid (delay expr)))))
+
+
+;; [lyn, 12/01/13] Some abstractions for manipulating current block id
+;; (define (get-current-block-id)
+;;  (*:.current-block-id *this-form*))
+;;
+;; (define (set-current-block-id! block-id)
+;;   (android-log (format #f "Before setting current-block-id to ~A its value is ~A" block-id (get-current-block-id)))
+;;   (set! (*:.current-block-id *this-form*) block-id)
+;;   (android-log (format #f "After setting current-block-id to ~A its value is ~A" block-id (get-current-block-id)))
+;;   )
+
+(define (with-current-block-id block-id thunk)
+;;  (let ((old-block-id (get-current-block-id)))
+;;    (set-current-block-id! block-id)
+;;    (let ((result (thunk)))
+;;      (set-current-block-id! old-block-id) ;; Reset block-id to remembered value
+;;      result))
+
+    (let ((old-block-id (*:get-current-block-id *this-form*)))
+      (*:set-current-block-id *this-form* block-id)
+      (let ((result (thunk)))
+        (*:set-current-block-id *this-form* old-block-id) ;; Reset block-id to remembered value
+        result)))
+      ;;(*:set-current-block-id *this-form* block-id)
+      ;;(thunk))
+
+
+;;; Johanna
+(define-syntax augment
+    (syntax-rules()
+      ((_ info exp)
+       (begin ;; [lyn, 12/01/13] Modified
+         (android-log (format #f "Evaluating: (augment ~A ~S)" info (quote exp)))
+         (android-log (format #f "last block with error ~A" (*:get-blocks-with-errors *this-form* )))
+          ;;(if (= info (*:get-last-block-with-error *this-form*)) ;; johanna [12.5.13] attempt to make errors disappear
+                       ;;Print out what this is down below and see
+          ;;(if (member info (*:get-last-block-with-error *this-form*))
+                   ;;(*:is-toast-allowed *this-form*)) ;; ie previous toast has been cleared
+
+              ;;(begin (send-to-block info (list "OK" "noError"))
+                     ;;(android-log "IS A MEMBER")))
+                  ;;(*:set-last-block-with-error  *this-form* (delete info (*:get-last-block-with-error *this-form))))))
+                  ;;(*:remove-from-last-block-with-error *this-form* info)
+                  ;;(android-log (*:get-last-block-with-error *this-form*)))))
+       ;;(android-log (with-current-block-id info (lambda () exp)))
+       ;;(with-current-block-id info (lambda () exp))))))
+
+          (let ((ans (with-current-block-id info (lambda () exp))))
+              (after-execution info)
+              ans)))))
+              ;;(with-current-block-id info (lambda () exp))))))) ;; use let to get value of exp and then remove error if gets to that point
+
+
+(define (after-execution block-id)
+  (if (member block-id (*:get-blocks-with-errors *this-form*))
+    (begin (send-to-block block-id (list "OK" "noError"))
+           (*:remove-from-last-block-with-error *this-form* block-id)
+           (*:remove-from-errors *this-form* block-id)
+           (android-log (*:get-blocks-with-errors *this-form*))
+           (android-log "ERROR OK")))
+  )
+
+;; (define (augment-proc info thunk)
+;; (begin (android-log "AUGMENT") (thunk)))
 
 ;; This code causes the evaluation of the code sent to the phone. Output
 ;; is normally generated by "Report Execution" balloons attached to blocks

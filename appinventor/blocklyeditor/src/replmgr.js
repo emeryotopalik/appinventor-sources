@@ -28,7 +28,7 @@ goog.require('goog.crypt.Sha1');
 goog.require('goog.crypt.Hmac');
 goog.require('goog.crypt.base64');
 
-top.loadAll = true;             // Global for debugging!
+//top.loadAll = true;             // Global for debugging!
 
 // Repl State
 // Repl "state" definitions
@@ -248,7 +248,7 @@ Blockly.ReplMgr.putYail = (function() {
             if (!phonereceiving) {
                 engine.receivefromphone();
             }
-            var work;
+        /*    var work;
             if (top.loadAll) {
                 var chunk;
                 var allcode = "";
@@ -286,6 +286,11 @@ Blockly.ReplMgr.putYail = (function() {
                     rs.phoneState.ioRunning = false;
                     return;
                 }
+            }  */
+            var work = rs.phoneState.phoneQueue.shift();
+            if (!work) {
+                rs.phoneState.ioRunning = false;
+                return;
             }
             var encoder = new goog.Uri.QueryData();
             conn = goog.net.XmlHttp();
@@ -572,11 +577,12 @@ Blockly.ReplMgr.processRetvals = function(responses) {
         console.log("processRetVals: " + JSON.stringify(r));
         switch(r.type) {
         case "return":
+            console.log("return case: r.blockid = " + r.blockid + "; r.status = " + r.status + "; r.value = " + r.value);
             if (r.blockid != "-1") {
                 block = Blockly.mainWorkspace.getBlockById(r.blockid);
                 if (r.status == "OK") {
                     block.replError = null;
-                    if (r.value && (r.value != '*nothing*')) {
+                    if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
                         this.setDoitResult(block, r.value);
                     }
                 } else {
@@ -599,8 +605,41 @@ Blockly.ReplMgr.processRetvals = function(responses) {
             window.parent.BlocklyPanel_popScreen();
             break;
         case "error":
-            console.log("processRetVals: Error value = " + r.value);
-            runtimeerr(escapeHTML(r.value) + Blockly.Msg.REPL_NO_ERROR_FIVE_SECONDS);
+            // Old version that pops up error in middle of blocks editor.
+            // console.log("processRetVals: Error value = " + r.value);
+            // runtimeerr(escapeHTML(r.value) + Blockly.Msg.REPL_NO_ERROR_FIVE_SECONDS);
+            console.log("Blockly.ReplMgr.processRetvals: error for block " + r.blockid); //JOHANNA
+            if (r.blockid != -1) {
+                block = Blockly.mainWorkspace.getBlockById(r.blockid);
+                block.replError = "Error from Companion: " + r.value;
+
+                block.setErrorIconText("Error from Companion " + r.value);
+                var rootBlock;
+                var current = block;
+                do {
+                    // uncollapse collapsed blocks
+                    if (current.collapsed){
+                        current.setCollapsed(false);
+                    }
+                    rootBlock = current;
+                    current = rootBlock.parentBlock_;
+                } while (current);
+
+                block.errorIcon.setVisible(true);
+
+            } else { // Not associated with particular block; put up Jeff's dialog
+                if (!this.runtimeError) {
+                    this.runtimeError = new goog.ui.Dialog(null, true);
+                }
+                if (this.runtimeError.isVisible()) {
+                    this.runtimeError.setVisible(false);
+                }
+                this.runtimeError.setTitle("Runtime Error");
+                this.runtimeError.setButtonSet(new goog.ui.Dialog.ButtonSet().
+                                               addButton({caption:"Dismiss"}, false, true));
+                this.runtimeError.setContent(r.value + "<br/><i>Note:</i>&nbsp;You will not see another error reported for 5 seconds.");
+                this.runtimeError.setVisible(true);
+            }
         }
     }
     Blockly.WarningHandler.checkAllBlocksForWarningsAndErrors();
