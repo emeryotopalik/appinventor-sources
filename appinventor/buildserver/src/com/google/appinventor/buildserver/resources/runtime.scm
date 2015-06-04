@@ -2505,20 +2505,21 @@ list, use the make-yail-list constructor with no arguments.
        (begin ;; [lyn, 12/01/13] Modified
          (android-log (format #f "Evaluating: (augment ~A ~S)" info (quote exp)))
          (android-log (format #f "last block with error ~A" (*:get-blocks-with-errors *this-form* )))
-          ;;(if (= info (*:get-last-block-with-error *this-form*)) ;; johanna [12.5.13] attempt to make errors disappear
+          ;;(if (= info (*:get-last-block-with-error *this-form*))) ;; johanna [12.5.13] attempt to make errors disappear
                        ;;Print out what this is down below and see
           ;;(if (member info (*:get-last-block-with-error *this-form*))
                    ;;(*:is-toast-allowed *this-form*)) ;; ie previous toast has been cleared
 
-              ;;(begin (send-to-block info (list "OK" "noError"))
-                     ;;(android-log "IS A MEMBER")))
-                  ;;(*:set-last-block-with-error  *this-form* (delete info (*:get-last-block-with-error *this-form))))))
+              ;;(begin (send-to-block info (list "OK" "noError")))
+                     ;;(android-log "IS A MEMBER")
+                  ;;(*:set-last-block-with-error  *this-form* (delete info (*:get-last-block-with-error *this-form)))
                   ;;(*:remove-from-last-block-with-error *this-form* info)
-                  ;;(android-log (*:get-last-block-with-error *this-form*)))))
+                  ;;(android-log (*:get-last-block-with-error *this-form*))
        ;;(android-log (with-current-block-id info (lambda () exp)))
-       ;;(with-current-block-id info (lambda () exp))))))
+       ;;(with-current-block-id info (lambda () exp))
 
           (let ((ans (with-current-block-id info (lambda () exp))))
+              (android-log (format #f "Result of with-current-block-id: ~S" ans))
               (after-execution info)
               ans)))))
               ;;(with-current-block-id info (lambda () exp))))))) ;; use let to get value of exp and then remove error if gets to that point
@@ -2526,7 +2527,9 @@ list, use the make-yail-list constructor with no arguments.
 
 (define (after-execution block-id)
   (if (member block-id (*:get-blocks-with-errors *this-form*))
-    (begin (send-to-block block-id (list "OK" "noError"))
+    (begin
+           (android-log (format #f "Before send-to_block: ~S" block-id)) ;; Never gets here because it is reading it as an error
+           (send-to-block block-id (list "OK" "noError"))
            (*:remove-from-last-block-with-error *this-form* block-id)
            (*:remove-from-errors *this-form* block-id)
            (android-log (*:get-blocks-with-errors *this-form*))
