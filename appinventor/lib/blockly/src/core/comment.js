@@ -34,6 +34,11 @@ goog.require('goog.userAgent');
 /**
  * Class for a comment.
  * @param {!Blockly.Block} block The block associated with this comment.
+ * [08/05/14, lyn] Added 2nd param to support multiple text bubbles on blocks.
+ * @param {!String} opt_iconChar: A single character for icon.
+ * //above added
+ * @param {!boolean} opt_clearable: A single character for icon.
+ * /above /added
  * @extends {Blockly.Icon}
  * @constructor
  */
