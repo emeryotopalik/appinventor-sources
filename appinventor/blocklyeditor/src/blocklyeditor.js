@@ -194,6 +194,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
   doitOption.text = Blockly.Msg.DO_IT;
   doitOption.callback = function () {
     myBlock.watch = false; //Emery
+    myBlock.doit = true;
     var yailText;
     //Blockly.Yail.blockToCode1 returns a string if the block is a statement
     //and an array if the block is a value
@@ -234,6 +235,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
     endWatchOption.text = Blockly.Msg.END_WATCH; //Emery
     endWatchOption.callback = function () {
       myBlock.watch = false;
+      myBlock.doit = false;
       //  myBlock.setVisible(true); emery
       console.log("END WATCH");
     }
@@ -262,6 +264,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
       console.log(yailText);
       //var watchYail = "(watch " + yailText + ")";
       myBlock.watch = true;
+      myBlock.doit = false;
       //myBlock.replError = "(watch)";
       myBlock.setCommentText(""); // resetting to blank before setting to updated list
       //myBlock.comment = new Blockly.Comment(myBlock);

@@ -539,19 +539,25 @@ Blockly.ReplMgr.processRetvals = function(responses) {
             console.log("return case: r.blockid = " + r.blockid + "; r.status = " + r.status + "; r.value = " + r.value);
             if (r.blockid != "-1") {
                 block = Blockly.mainWorkspace.getBlockById(r.blockid);
-                if (r.status == "OK") {
-                    block.replError = null;
-                    if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
-                        if (block.watch) { //JOHANNA
-                            this.appendToWatchResult(block, r.value);
-                        } else { // need a way to differentiate between doit and end watch
-                            /* if (end watch) {
-                                //do nothing or set endwatch
-                            } else {*/
-                                this.setDoitResult(block, r.value);
-                            }
-                        }
-                } else {
+               if (r.status == "OK") {
+                   block.replError = null;
+                   if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
+                       //      if (block.watch) { //JOHANNA
+                       //        this.appendToWatchResult(block, r.value);
+                       //  } else { // need a way to differentiate between doit and end watch
+                       if (block.doit) {
+                           this.setDoitResult(block, r.value);
+                       }
+                   }
+                   //}
+               } else if (r.status == "WATCH") {
+                   block.replError = null;
+                   if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
+                    if (block.watch) {
+                        this.appendToWatchResult(block, r.value);
+                    }
+                   }
+               } else {
                     if (r.value) {
                         block.replError = Blockly.Msg.REPL_ERROR_FROM_COMPANION + ": " + r.value;
                     } else {

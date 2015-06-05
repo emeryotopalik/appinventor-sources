@@ -2531,10 +2531,10 @@ list, use the make-yail-list constructor with no arguments.
   (syntax-rules()
     ((_ info exp)
       (begin
-      (android-log "WATCH SOMETHInG")
+      (android-log "WATCH")
       (let ((result exp))
         (android-log result)
-        (send-to-block info (list "OK" result))
+        (send-to-block info (list "WATCH" result))
         result)))))
 
 
