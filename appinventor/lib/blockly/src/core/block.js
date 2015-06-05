@@ -2014,6 +2014,11 @@ Blockly.Block.prototype.setCommentText = function(text) {
   }
 };
 
+//Emery
+Blockly.Block.prototype.setFocus = function(e) {
+   this.comment.textareaFocus_();
+}
+
 /**
  * Set this block's warning text.
  * @param {?string} text The text, or null to delete.

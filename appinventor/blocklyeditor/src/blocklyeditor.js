@@ -169,18 +169,19 @@ Blockly.Block.prototype.customContextMenu = function(options) {
 
   var myBlock = this;
 
-  var doitOption = {enabled: this.disabled?false : true};
-  var watchOption = {enabled: this.disabled?false : true}; //JOHANNA
+  var doitOption = {enabled: this.disabled ? false : true};
+  var watchOption = {enabled: this.disabled ? false : true}; //JOHANNA
+  var endWatchOption = {enabled: this.disabled ? false : true}; //Emery
 
   if (window.parent.BlocklyPanel_checkIsAdmin()) {
-    var yailOption = {enabled: this.disabled?false : true};
+    var yailOption = {enabled: this.disabled ? false : true};
     yailOption.text = Blockly.Msg.GENERATE_YAIL;
-    yailOption.callback = function() {
+    yailOption.callback = function () {
       var yailText;
       //Blockly.Yail.blockToCode1 returns a string if the block is a statement
       //and an array if the block is a value
       var yailTextOrArray = Blockly.Yail.blockToCode1(myBlock);
-      if(yailTextOrArray instanceof Array){
+      if (yailTextOrArray instanceof Array) {
         yailText = yailTextOrArray[0];
       } else {
         yailText = yailTextOrArray;
@@ -191,7 +192,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
   }
 
   doitOption.text = Blockly.Msg.DO_IT;
-  doitOption.callback = function() {
+  doitOption.callback = function () {
     myBlock.watch = false; //Emery
     var yailText;
     //Blockly.Yail.blockToCode1 returns a string if the block is a statement
@@ -203,33 +204,43 @@ Blockly.Block.prototype.customContextMenu = function(options) {
       dialog.setTitle(Blockly.Msg.CAN_NOT_DO_IT);
       dialog.setContent(Blockly.Msg.CONNECT_TO_DO_IT);
       dialog.setButtonSet(new goog.ui.Dialog.ButtonSet().
-        addButton(goog.ui.Dialog.ButtonSet.DefaultButtons.OK,
+          addButton(goog.ui.Dialog.ButtonSet.DefaultButtons.OK,
           false, true));
       dialog.setVisible(true);
     } else {
-      if(yailTextOrArray instanceof Array){
+      if (yailTextOrArray instanceof Array) {
         yailText = yailTextOrArray[0];
       } else {
         yailText = yailTextOrArray;
       }
-      Blockly.ReplMgr.putYail(yailText, myBlock);
+      Blockly.ReplMgr.putYail(yailText, myBlock)
     }
   };
   options.push(doitOption);
 
 
-  if (myBlock.watch == true) {
-    var endWatchOption = {enabled: this.disabled?false : true}; //Emery
+  /*if (myBlock.watch == true) {
+    // need a global variable to turn do it off.
     endWatchOption.text = Blockly.Msg.END_WATCH; //Emery
-    endWatchOption.callback = function() {
+    endWatchOption.callback = function () {
       myBlock.watch = false;
+      //  myBlock.setVisible(true); emery
       console.log("END WATCH");
     }
     options.push(endWatchOption);
-  }
+  }  */
 
+  if (myBlock.watch) {
+    endWatchOption.text = Blockly.Msg.END_WATCH; //Emery
+    endWatchOption.callback = function () {
+      myBlock.watch = false;
+      //  myBlock.setVisible(true); emery
+      console.log("END WATCH");
+    }
+    options.push(endWatchOption);
+  } else {
   watchOption.text = Blockly.Msg.WATCH; //JOHANNA
-  watchOption.callback = function() {     // check to see if connected like in do it?
+  watchOption.callback = function () {     // check to see if connected like in do it?
     var yailText;
     var yailTextOrArray = Blockly.Yail.blockToCode(myBlock);
     var dialog;
@@ -253,10 +264,14 @@ Blockly.Block.prototype.customContextMenu = function(options) {
       myBlock.watch = true;
       //myBlock.replError = "(watch)";
       myBlock.setCommentText(""); // resetting to blank before setting to updated list
+      //myBlock.comment = new Blockly.Comment(myBlock);
+      //myBlock.comment.setCommentText("");//emery
       Blockly.ReplMgr.putYail(yailText, myBlock);
+      //myBlock.setVisible(true); Emery
     }
   };
   options.push(watchOption);
+}
 
 
 
