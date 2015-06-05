@@ -619,23 +619,33 @@ Blockly.ReplMgr.processRetvals = function(responses) {
 
 
 Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
-    var comment = "";
-    if (block.comment) {
-        comment = block.comment.getText();
-    }
-    // This version adds at beginning:
-    //     comment = value + "\n" + comment;
-    // This version adds at end:
-    comment = comment + value + "\n"
-    // we don't want this because it resets the box every time, which is annoying and unusable.[Emery]
-   // if (block.comment) {
+    /* var comment = "";
+     if (block.comment) {
+     comment = block.comment.getText();
+     }
+     // This version adds at beginning:
+     //     comment = value + "\n" + comment;
+     // This version adds at end:
+     comment = comment + value + "\n"
+     // we don't want this because it resets the box every time, which is annoying and unusable.[Emery]
+     // if (block.comment) {
      //   block.comment.setVisible(false);
-    //}
-    block.setCommentText(comment);
-    block.comment.setVisible(true);
+     //}
+     block.setCommentText(comment);
+     block.comment.setVisible(true);
+     } */
+    var separator = "";
+    if (block.getTextBubbleText(Blockly.BlocklyEditor.watchChar)) {
+        separator = "\n-----\n" +  block.getTextBubbleText(Blockly.BlocklyEditor.watchChar);
+        // If we don't set visible to false, the comment
+        // doesn't always change when it should...
+        // this.textBubbles[Blockly.BlocklyEditor.doitChar].setVisible(false);
+    }
+    block.setTextBubbleText(Blockly.BlocklyEditor.watchChar, separator + value);
 }
 
-Blockly.ReplMgr.setDoitResult = function(block, value) {
+
+/*Blockly.ReplMgr.setDoitResult = function(block, value) {
     var patt = /Do It Result:.*?\n---\n/m;
     var comment = "";
     var result = 'Do It Result: ' + value + '\n---\n';
@@ -658,6 +668,18 @@ Blockly.ReplMgr.setDoitResult = function(block, value) {
     //}
     block.setCommentText(comment);
     block.comment.setVisible(true);
+};*/
+
+
+Blockly.ReplMgr.setDoitResult = function(block, value) {
+  var separator = "";
+  if  (block.getTextBubbleText(Blockly.BlocklyEditor.doitChar)) {
+    separator = "\n-----\n";
+    // If we don't set visible to false, the comment
+    // doesn't always change when it should...
+    // this.textBubbles[Blockly.BlocklyEditor.doitChar].setVisible(false);
+  }
+  block.setTextBubbleText(Blockly.BlocklyEditor.doitChar, separator + value);
 };
 
 Blockly.ReplMgr.startAdbDevice = function(rs, usb) {

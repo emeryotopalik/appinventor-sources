@@ -135,6 +135,9 @@ Blockly.BlocklyEditor.startup = function(documentBody, formName) {
     }
   }
 
+  Blockly.BlocklyEditor.doitChar = "D";
+  Blockly.BlocklyEditor.watchChar = "W";
+
   /******************************************************************************/
 
   Blockly.bindEvent_(Blockly.mainWorkspace.getCanvas(), 'blocklyWorkspaceChange', this,
@@ -186,7 +189,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
       } else {
         yailText = yailTextOrArray;
       }
-      myBlock.setCommentText(yailText);
+      myBlock.setTextBubbleText(Blockly.BlocklyEditor.yailChar, yailText);
     };
     options.push(yailOption);
   }
@@ -266,7 +269,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
       myBlock.watch = true;
       myBlock.doit = false;
       //myBlock.replError = "(watch)";
-      myBlock.setCommentText(""); // resetting to blank before setting to updated list
+   //   myBlock.setCommentText(""); // resetting to blank before setting to updated list
       //myBlock.comment = new Blockly.Comment(myBlock);
       //myBlock.comment.setCommentText("");//emery
       Blockly.ReplMgr.putYail(yailText, myBlock);
