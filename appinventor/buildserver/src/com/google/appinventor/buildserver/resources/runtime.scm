@@ -1215,7 +1215,11 @@
   (let ((coerced-arg (coerce-arg property-value property-type)))
     (android-log (format #f "coerced property value was: ~A " coerced-arg))
     (if (all-coercible? (list coerced-arg))
-        (invoke comp prop-name coerced-arg)
+        (begin
+         (android-log (format #f "before invoke ~A ~A ~S" comp prop-name coerced-arg))
+         (invoke comp prop-name coerced-arg)
+         (android-log (format #f "after invoke ~A ~A ~S" comp prop-name coerced-arg))
+        )
         (generate-runtime-type-error prop-name (list property-value)))))
 
 
@@ -2476,11 +2480,11 @@ list, use the make-yail-list constructor with no arguments.
 ;; (define (get-current-block-id)
 ;;  (*:.current-block-id *this-form*))
 ;;
-;; (define (set-current-block-id! block-id)
-;;   (android-log (format #f "Before setting current-block-id to ~A its value is ~A" block-id (get-current-block-id)))
-;;   (set! (*:.current-block-id *this-form*) block-id)
-;;   (android-log (format #f "After setting current-block-id to ~A its value is ~A" block-id (get-current-block-id)))
-;;   )
+; (define (set-current-block-id! block-id)
+ ;  (android-log (format #f "Before setting current-block-id to ~A its value is ~A" block-id (get-current-block-id)))
+  ; (set! (*:.current-block-id *this-form*) block-id)
+   ;(android-log (format #f "After setting current-block-id to ~A its value is ~A" block-id (get-current-block-id)))
+   ;)
 
 (define (with-current-block-id block-id thunk)
 ;;  (let ((old-block-id (get-current-block-id)))
@@ -2502,7 +2506,7 @@ list, use the make-yail-list constructor with no arguments.
 (define-syntax augment
     (syntax-rules()
       ((_ info exp)
-       (begin ;; [lyn, 12/01/13] Modified
+       (begin
          (android-log (format #f "Evaluating: (augment ~A ~S)" info (quote exp)))
          (android-log (format #f "last block with error ~A" (*:get-blocks-with-errors *this-form* )))
           ;;(if (= info (*:get-last-block-with-error *this-form*))) ;; johanna [12.5.13] attempt to make errors disappear
@@ -2519,7 +2523,7 @@ list, use the make-yail-list constructor with no arguments.
        ;;(with-current-block-id info (lambda () exp))
 
           (let ((ans (with-current-block-id info (lambda () exp))))
-              (android-log (format #f "Result of with-current-block-id: ~S" ans))
+              (android-log (format #f "Result is ~S for id ~S and expression ~S" ans info (quote exp)))
               (after-execution info)
               ans)))))
               ;;(with-current-block-id info (lambda () exp))))))) ;; use let to get value of exp and then remove error if gets to that point
@@ -2528,7 +2532,6 @@ list, use the make-yail-list constructor with no arguments.
 (define (after-execution block-id)
   (if (member block-id (*:get-blocks-with-errors *this-form*))
     (begin
-           (android-log (format #f "Before send-to_block: ~S" block-id)) ;; Never gets here because it is reading it as an error
            (send-to-block block-id (list "OK" "noError"))
            (*:remove-from-last-block-with-error *this-form* block-id)
            (*:remove-from-errors *this-form* block-id)
@@ -2556,11 +2559,11 @@ list, use the make-yail-list constructor with no arguments.
                   (list "OK"
                         (get-display-representation (force promise)))
                   (exception YailRuntimeError
-                             (android-log (exception:getMessage))
+                             (android-log (format #f "in-ui YailRuntimeError ~A" exception:getMessage))
                              (list "NOK"
                                    (exception:getMessage))))
                  (exception java.lang.Exception
-                            (android-log (exception:getMessage))
+                            (android-log (format #f "in-ui java.lang.Exception ~A" exception:getMessage))
                             (exception:printStackTrace)
                             (list
                              "NOK"
