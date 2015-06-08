@@ -219,6 +219,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
       }
       Blockly.ReplMgr.putYail(yailText, myBlock)
     }
+
   };
   options.push(doitOption);
 

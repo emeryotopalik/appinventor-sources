@@ -220,6 +220,13 @@ Blockly.Block.prototype.warning = null;
 Blockly.Block.prototype.errorIcon = null;
 
 /**
+ * Dictionary of block's text bubble icons (for doit, watch, xml, yail, etc.)
+ * Maps a string key to an instance of Blockly.Comment.
+ * @type {Blockly.Comment}
+ */
+Blockly.Block.prototype.textBubbles = {}; //emery
+
+/**
  * Returns a list of mutator, comment, and warning icons.
  * @return {!Array} List of icons.
  */
@@ -236,6 +243,10 @@ Blockly.Block.prototype.getIcons = function() {
   }
   if (this.errorIcon) {
     icons.push(this.errorIcon);
+  }
+  var textBubbleKeys = Object.keys(this.textBubbles);  //emery
+  for (var i = 0, key; key = textBubbleKeys[i]; i++) {
+    icons.push(this.textBubbles[key]);
   }
   return icons;
 };
@@ -346,6 +357,7 @@ Blockly.Block.prototype.unselect = function() {
 };
 
 /**
+<<<<<<< HEAD
  * Mark this block as Bad.  Highlight it visually in Red.
  */
 Blockly.Block.prototype.badBlock = function() {
@@ -746,7 +758,12 @@ Blockly.Block.prototype.showContextMenu_ = function(e) {
   var block = this;
   var options = [];
 
+<<<<<<< HEAD
   if (!this.isBadBlock() && this.isDeletable() && this.isMovable() && !block.isInFlyout) {
+=======
+  if (this.isDeletable() && this.isMovable() && !block.isInFlyout) {
+ // if (!this.isBadBlock() && this.isDeletable() && this.isMovable() && !block.isInFlyout) { //emery
+>>>>>>> watch with separate bubbles
     // Option to duplicate this block.
     var duplicateOption = {
       text: Blockly.Msg.DUPLICATE_BLOCK,
@@ -2018,6 +2035,60 @@ Blockly.Block.prototype.setCommentText = function(text) {
 Blockly.Block.prototype.setFocus = function(e) {
    this.comment.textareaFocus_();
 }
+
+/**
+ * [lyn, 08/05/2104] Returns the text from the text bubble with this key (or '' if none).
+ * @param {?string} iconChar: the single-character string used to represent the bubble
+ *   and index it in this.textBubbles.
+ * Note: this could be used to replace comments, by using '?' iconChar.
+ * @return {string} the text associated with the textBubble.
+ */
+Blockly.Block.prototype.getTextBubbleText = function(iconChar) {
+  var textBubble = this.textBubbles[iconChar];
+  console.log(iconChar + " in getTextBubbleText");
+  if (textBubble) { //emery was this.comment or something
+    var text = textBubble.getText();
+    console.log("The text in getTextBubbleText: " + text);
+    // Trim off trailing whitespace.
+    return text.replace(/\s+$/, '').replace(/ +\n/g, '\n');
+  }
+  return '';
+};
+
+/**
+ * [lyn, 08/05/2104]
+ * Set this block's textBubble text, indexed by iconChar.
+ * @param {?string} iconChar: the single-character string used to represent the bubble
+ *   and index it in this.textBubbles.
+ * @param {?string} text The text, or null to delete.
+ */
+Blockly.Block.prototype.setTextBubbleText = function(iconChar, text) {
+  var textBubble = this.textBubbles[iconChar];
+  var changedState = false;
+  if (goog.isString(text)) {
+    if (!textBubble) {
+      textBubble = new Blockly.Comment(this, iconChar);
+      this.textBubbles[iconChar] = textBubble;
+      changedState = true;
+    }
+    textBubble.setText(/** @type {string} */ (text));
+    console.log("JUST SET TEXT");
+  } else {
+    if (textBubble) {
+      this.comment.dispose();
+      changedState = true;
+    }
+    console.log("DID NOT SET TEXT");
+  }
+  if (this.rendered) {
+    this.render();
+    if (changedState) {
+      // Adding or removing a comment icon will cause the block to change shape.
+      this.bumpNeighbours_();
+    }
+  }
+};
+
 
 /**
  * Set this block's warning text.
