@@ -550,7 +550,7 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                        }
                    }
                    //}
-               } else if (r.status == "WATCH") {
+               } else if (r.status == "WATCH") {  //emery
                    block.replError = null;
                    if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
                     if (block.watch) {
@@ -636,12 +636,13 @@ Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
      } */
     var separator = "";
     if (block.getTextBubbleText(Blockly.BlocklyEditor.watchChar)) {
-        separator = "\n-----\n" +  block.getTextBubbleText(Blockly.BlocklyEditor.watchChar);
+        separator = "\n" + block.getTextBubbleText(Blockly.BlocklyEditor.watchChar);
         // If we don't set visible to false, the comment
         // doesn't always change when it should...
-        // this.textBubbles[Blockly.BlocklyEditor.doitChar].setVisible(false);
+      //   this.textBubbles[Blockly.BlocklyEditor.watchChar].setVisible(false);
     }
-    block.setTextBubbleText(Blockly.BlocklyEditor.watchChar, separator + value);
+    block.setTextBubbleText(Blockly.BlocklyEditor.watchChar, value + separator);
+   // this.textBubbles[Blockly.BlocklyEditor.watchChar].setVisible(true);
 }
 
 
@@ -672,14 +673,15 @@ Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
 
 
 Blockly.ReplMgr.setDoitResult = function(block, value) {
-  var separator = "";
-  if  (block.getTextBubbleText(Blockly.BlocklyEditor.doitChar)) {
-    separator = "\n-----\n";
+    var separator = "";
+    if  (block.getTextBubbleText(Blockly.BlocklyEditor.doitChar)) {
+    separator = "\n-----\n" + block.getTextBubbleText(Blockly.BlocklyEditor.doitChar);
     // If we don't set visible to false, the comment
     // doesn't always change when it should...
-    // this.textBubbles[Blockly.BlocklyEditor.doitChar].setVisible(false);
-  }
-  block.setTextBubbleText(Blockly.BlocklyEditor.doitChar, separator + value);
+   //  this.textBubbles[Blockly.BlocklyEditor.doitChar].setVisible(false);
+    }
+  block.setTextBubbleText(Blockly.BlocklyEditor.doitChar, value + separator);
+    //this.textBubbles[Blockly.BlocklyEditor.doitChar].setVisible(true);
 };
 
 Blockly.ReplMgr.startAdbDevice = function(rs, usb) {
