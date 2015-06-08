@@ -2045,10 +2045,8 @@ Blockly.Block.prototype.setFocus = function(e) {
  */
 Blockly.Block.prototype.getTextBubbleText = function(iconChar) {
   var textBubble = this.textBubbles[iconChar];
-  console.log(iconChar + " in getTextBubbleText");
   if (textBubble) { //emery was this.comment or something
     var text = textBubble.getText();
-    console.log("The text in getTextBubbleText: " + text);
     // Trim off trailing whitespace.
     return text.replace(/\s+$/, '').replace(/ +\n/g, '\n');
   }
@@ -2072,13 +2070,11 @@ Blockly.Block.prototype.setTextBubbleText = function(iconChar, text) {
       changedState = true;
     }
     textBubble.setText(/** @type {string} */ (text));
-    console.log("JUST SET TEXT");
   } else {
     if (textBubble) {
       this.comment.dispose();
       changedState = true;
     }
-    console.log("DID NOT SET TEXT");
   }
   if (this.rendered) {
     this.render();
