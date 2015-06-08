@@ -137,6 +137,7 @@ Blockly.BlocklyEditor.startup = function(documentBody, formName) {
 
   Blockly.BlocklyEditor.doitChar = "D";
   Blockly.BlocklyEditor.watchChar = "W";
+  Blockly.BlocklyEditor.yailChar = "Y";
 
   /******************************************************************************/
 

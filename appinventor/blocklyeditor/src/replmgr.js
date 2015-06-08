@@ -675,7 +675,7 @@ Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
 Blockly.ReplMgr.setDoitResult = function(block, value) {
     var separator = "";
     if  (block.getTextBubbleText(Blockly.BlocklyEditor.doitChar)) {
-    separator = "\n-----\n" + block.getTextBubbleText(Blockly.BlocklyEditor.doitChar);
+    separator = "\n" + block.getTextBubbleText(Blockly.BlocklyEditor.doitChar);
     // If we don't set visible to false, the comment
     // doesn't always change when it should...
    //  this.textBubbles[Blockly.BlocklyEditor.doitChar].setVisible(false);
