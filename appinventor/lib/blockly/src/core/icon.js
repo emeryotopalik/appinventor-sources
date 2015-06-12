@@ -152,6 +152,7 @@ Blockly.Icon.prototype.renderIcon = function(cursorX) {
   } else {
     cursorX += diameter + Blockly.BlockSvg.SEP_SPACE_X;
   }
+  console.log("CURSORX: " + cursorX);
   return cursorX;
 };
 
@@ -173,13 +174,13 @@ Blockly.Icon.prototype.setIconLocation = function(x, y) {
  * Recompute the icon's location from scratch.
  */
 Blockly.Icon.prototype.computeIconLocation = function() {
-  console.log("COMPUTING ICON LOCATION");
   // Find coordinates for the centre of the icon and update the arrow.
   var blockXY = this.block_.getRelativeToSurfaceXY();
+ // console.log("blockXY: " + blockXY);
   var iconXY = Blockly.getRelativeXY_(this.iconGroup_);
+ // console.log("iconXY: " + iconXY);
   var newX = blockXY.x + iconXY.x + Blockly.Icon.RADIUS;
   var newY = blockXY.y + iconXY.y + Blockly.Icon.RADIUS;
-  console.log(newX + " " + newY);
   if (newX !== this.iconX_ || newY !== this.iconY_) {
     this.setIconLocation(newX, newY);
   }

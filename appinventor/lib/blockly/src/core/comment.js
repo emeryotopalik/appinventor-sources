@@ -38,14 +38,21 @@ goog.require('goog.userAgent');
  * @param {!String} opt_iconChar: A single character for icon.
  * //above added
  * @param {!boolean} opt_clearable: A single character for icon.
- * /above /added
+ * //above added
+ * @param {!boolean} opt_endable: A single character for icon.
+ * //above added
+ * @param {!boolean} opt_doable: A single character for icon.
+ * //above added
  * @extends {Blockly.Icon}
  * @constructor
  */
 //Blockly.Comment = function(block) {    //emery
-Blockly.Comment = function(block, opt_iconChar, opt_clearable) {
+Blockly.Comment = function(block, opt_iconChar, opt_clearable, opt_endable, opt_doable) {
+  this.myblock = block; // added
   this.iconChar = opt_iconChar ? opt_iconChar : '?';      //added
   this.clearable = opt_clearable ? true : false;                 //added
+  this.endable = opt_endable ? true : false;                       //added
+  this.doable = opt_doable ? true : false;
   Blockly.Comment.superClass_.constructor.call(this, block);
   this.createIcon_();
 };
@@ -115,11 +122,33 @@ Blockly.Comment.prototype.createEditor_ = function() {
   body.setAttribute('xmlns', Blockly.HTML_NS);
   body.className = 'blocklyMinimalBody';
 
+  //[emery, 06/10/2015] new close button
+  this.closeButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
+  this.closeButton_.appendChild(document.createTextNode('Close'));
+  body.appendChild(this.closeButton_);
+  Blockly.bindEvent_(this.closeButton_, 'mouseup', this, this.closeButtonClick_);  //emery
+
   // [lyn, 08/18/2014] new clear button //emery
   if (this.clearable) {
     this.clearButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
     this.clearButton_.appendChild(document.createTextNode('Clear'));
     body.appendChild(this.clearButton_);
+    Blockly.bindEvent_(this.clearButton_, 'mouseup', this, this.clearButtonClick_);  //emery
+  }
+
+  // [emery, 06/10/2015] new toggle watch button
+  if (this.endable) {
+    this.toggleButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
+    this.toggleButton_.appendChild(document.createTextNode('Toggle Watch'));
+    body.appendChild(this.toggleButton_);
+    Blockly.bindEvent_(this.toggleButton_, 'mouseup', this, this.toggleButtonClick_);  //emery
+  }
+
+  if (this.doable) {
+    this.doitButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
+    this.doitButton_.appendChild(document.createTextNode('Do It Again'));
+    body.appendChild(this.doitButton_);
+    Blockly.bindEvent_(this.doitButton_, 'mouseup', this, this.doitAgainButtonClick_);  //emery
   }
 
   this.textarea_ = document.createElementNS(Blockly.HTML_NS, 'textarea');
@@ -130,6 +159,54 @@ Blockly.Comment.prototype.createEditor_ = function() {
   Blockly.bindEvent_(this.textarea_, 'mouseup', this, this.textareaFocus_);
   return this.foreignObject_;
 };
+
+/**
+ * Close Button: Emery
+ */
+Blockly.Comment.prototype.closeButtonClick_ = function(e) {
+  if (this.iconChar == Blockly.BlocklyEditor.watchChar) {
+    this.myblock.watch = false;
+  }
+    this.dispose();
+    if (this.myblock.rendered) {
+      this.myblock.render();
+      this.myblock.bumpNeighbours_();
+    }
+}
+
+/**
+ * Clear Button: Emery 6/9/15
+ */
+Blockly.Comment.prototype.clearButtonClick_ = function(e) {
+  this.setText('');
+}
+
+/**
+ * Toggle Watch Button: Emery 6/10/15
+ */
+Blockly.Comment.prototype.toggleButtonClick_ = function (e) {
+  if (this.myblock.watch) {
+    this.myblock.watch = false;
+    this.myblock.setTextBubbleText(Blockly.BlocklyEditor.watchChar, "------\n" +
+        this.myblock.getTextBubbleText(Blockly.BlocklyEditor.watchChar));
+  } else {
+    //this.myblock.setTextBubbleText(Blockly.BlocklyEditor.watchChar, "------\n" +
+      //  this.myblock.getTextBubbleText(Blockly.BlocklyEditor.watchChar));
+    this.myblock.watch = true;
+  }
+}
+
+Blockly.Comment.prototype.doitAgainButtonClick_ = function (e) {
+  this.myblock.doit = true;
+  var yailText;
+  var yailTextOrArray = Blockly.Yail.blockToCode1(this.myblock);
+  if (yailTextOrArray instanceof Array) {
+    yailText = yailTextOrArray[0];
+  } else {
+    yailText = yailTextOrArray;
+  }
+  Blockly.ReplMgr.putYail(yailText, this.myblock);
+}
 
 /**
  * Add or remove editability of the comment.
