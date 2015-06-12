@@ -583,16 +583,19 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                        //  } else { // need a way to differentiate between doit and end watch
                        if (block.doit) {
                            this.setDoitResult(block, r.value);
+                           block.doit = false;
+                       } else if (block.watch) {
+                               this.appendToWatchResult(block, r.value);
                        }
                    }
                    //}
-               } else if (r.status == "WATCH") {  //emery
+              /* } else if (r.status == "WATCH") {  //emery
                    block.replError = null;
                    if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
                     if (block.watch) {
                         this.appendToWatchResult(block, r.value);
                     }
-                   }
+                   } */
                } else {
                     if (r.value) {
                         block.replError = Blockly.Msg.REPL_ERROR_FROM_COMPANION + ": " + r.value;
@@ -656,7 +659,7 @@ Blockly.ReplMgr.processRetvals = function(responses) {
 
 Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
     /* var comment = "";
-     if (block.comment) {
+     if (block.comment) {                                                                                        teterm
      comment = block.comment.getText();
      }
      // This version adds at beginning:

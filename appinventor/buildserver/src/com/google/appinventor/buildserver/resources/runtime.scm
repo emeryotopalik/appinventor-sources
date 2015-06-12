@@ -2577,7 +2577,7 @@ list, use the make-yail-list constructor with no arguments.
       (android-log "WATCH")
       (let ((result exp))
         (android-log result)
-        (send-to-block info (list "WATCH" result))
+        (send-to-block info (list "OK" result))
         result)))))
 
 

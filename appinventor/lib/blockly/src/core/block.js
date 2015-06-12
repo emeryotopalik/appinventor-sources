@@ -357,7 +357,6 @@ Blockly.Block.prototype.unselect = function() {
 };
 
 /**
-<<<<<<< HEAD
  * Mark this block as Bad.  Highlight it visually in Red.
  */
 Blockly.Block.prototype.badBlock = function() {
@@ -758,12 +757,7 @@ Blockly.Block.prototype.showContextMenu_ = function(e) {
   var block = this;
   var options = [];
 
-<<<<<<< HEAD
   if (!this.isBadBlock() && this.isDeletable() && this.isMovable() && !block.isInFlyout) {
-=======
-  if (this.isDeletable() && this.isMovable() && !block.isInFlyout) {
- // if (!this.isBadBlock() && this.isDeletable() && this.isMovable() && !block.isInFlyout) { //emery
->>>>>>> watch with separate bubbles
     // Option to duplicate this block.
     var duplicateOption = {
       text: Blockly.Msg.DUPLICATE_BLOCK,
@@ -780,17 +774,20 @@ Blockly.Block.prototype.showContextMenu_ = function(e) {
     if (this.isEditable() && !this.collapsed_ && Blockly.comments) {
       // Option to add/remove a comment.
       var commentOption = {enabled: true};
-      if (this.comment) {
+      if (this.comment) {  //emery
+        //commentOption = {enabled: false};
         commentOption.text = Blockly.Msg.REMOVE_COMMENT;
         commentOption.callback = function() {
           block.setCommentText(null);
         };
       } else {
+        commentOption = {enabled: true};
         commentOption.text = Blockly.Msg.ADD_COMMENT;
         commentOption.callback = function() {
           block.setCommentText('');
         };
       }
+      console.log("icons: " + this.getIcons());
       options.push(commentOption);
     }
 
@@ -2012,7 +2009,7 @@ Blockly.Block.prototype.setCommentText = function(text) {
   var changedState = false;
   if (goog.isString(text)) {
     if (!this.comment) {
-      this.comment = new Blockly.Comment(this);
+      this.comment = new Blockly.Comment(this, Blockly.BlocklyEditor.commentChar, true, false, false);
       changedState = true;
     }
     this.comment.setText(/** @type {string} */ (text));
@@ -2031,10 +2028,6 @@ Blockly.Block.prototype.setCommentText = function(text) {
   }
 };
 
-//Emery
-Blockly.Block.prototype.setFocus = function(e) {
-   this.comment.textareaFocus_();
-}
 
 /**
  * [lyn, 08/05/2104] Returns the text from the text bubble with this key (or '' if none).
@@ -2065,7 +2058,13 @@ Blockly.Block.prototype.setTextBubbleText = function(iconChar, text) {
   var changedState = false;
   if (goog.isString(text)) {
     if (!textBubble) {
-      textBubble = new Blockly.Comment(this, iconChar);
+      if (iconChar == Blockly.BlocklyEditor.watchChar) { // to include endwatch button emery
+        textBubble = new Blockly.Comment(this, iconChar, true, true, false);
+      } else if (iconChar == Blockly.BlocklyEditor.doitChar) {
+          textBubble = new Blockly.Comment(this, iconChar, true, false, true);
+      } else {
+      textBubble = new Blockly.Comment(this, iconChar, true, false, false);
+    }
       this.textBubbles[iconChar] = textBubble;
       changedState = true;
     }

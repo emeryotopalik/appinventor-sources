@@ -549,7 +549,9 @@ Blockly.BlockSvg.prototype.renderHere = function() {
   }
   // Move the icons into position.
   var icons = this.block_.getIcons();
+    console.log(icons); //emery
   for (var x = 0; x < icons.length; x++) {
+      console.log("THIS" + x); //emery
     cursorX = icons[x].renderIcon(cursorX);
   }
   cursorX += Blockly.RTL ?
