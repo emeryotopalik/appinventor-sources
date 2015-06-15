@@ -152,7 +152,6 @@ Blockly.Icon.prototype.renderIcon = function(cursorX) {
   } else {
     cursorX += diameter + Blockly.BlockSvg.SEP_SPACE_X;
   }
-  console.log("CURSORX: " + cursorX);
   return cursorX;
 };
 
