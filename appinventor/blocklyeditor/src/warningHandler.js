@@ -27,7 +27,8 @@ Blockly.WarningHandler.warningState = {
   ERROR : 2
 }
 
-Blockly.WarningHandler.updateWarningErrorCount = function() {
+Blockly.WarningHandler.
+    updateWarningErrorCount = function() {
   //update the error and warning count in the UI
   Blockly.mainWorkspace.warningIndicator.updateWarningAndErrorCount();
 }

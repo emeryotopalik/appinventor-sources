@@ -167,11 +167,16 @@ Blockly.Comment.prototype.closeButtonClick_ = function(e) {
   if (this.iconChar == Blockly.BlocklyEditor.watchChar) {
     this.myblock.watch = false;
   }
-    this.dispose();
-    if (this.myblock.rendered) {
-      this.myblock.render();
-      this.myblock.bumpNeighbours_();
-    }
+  if (this.iconChar == Blockly.BlocklyEditor.commentChar) {
+    this.myblock.setCommentText(null);
+  } else {
+    this.myblock.setTextBubbleText(this.iconChar, null);
+  }
+  //  this.dispose();
+   // if (this.myblock.rendered) {
+    //  this.myblock.render();
+     // this.myblock.bumpNeighbours_();
+    //}
 }
 
 /**
@@ -343,6 +348,10 @@ Blockly.Comment.prototype.setText = function(text) {
  * Dispose of this comment.
  */
 Blockly.Comment.prototype.dispose = function() {
+  if (this.iconChar == Blockly.BlocklyEditor.commentChar) {
   this.block_.comment = null;
+  } else {
+    this.block_.textBubbles[this.iconChar] = null;
+  }
   Blockly.Icon.prototype.dispose.call(this);
 };

@@ -155,6 +155,13 @@ Blockly.Block.prototype.fill = function(workspace, prototypeName) {
   // This is missing from our latest version
   //workspace.addTopBlock(this);
 
+  /**
+   * Dictionary of block's text bubble icons (for doit, watch, xml, yail, etc.)
+   * Maps a string key to an instance of Blockly.Comment.
+   * @type {Blockly.Comment}
+   */
+  this.textBubbles = {}; //emery
+
   // Copy the type-specific functions and data from the prototype.
   if (prototypeName) {
     this.type = prototypeName;
@@ -219,12 +226,6 @@ Blockly.Block.prototype.warning = null;
  */
 Blockly.Block.prototype.errorIcon = null;
 
-/**
- * Dictionary of block's text bubble icons (for doit, watch, xml, yail, etc.)
- * Maps a string key to an instance of Blockly.Comment.
- * @type {Blockly.Comment}
- */
-Blockly.Block.prototype.textBubbles = {}; //emery
 
 /**
  * Returns a list of mutator, comment, and warning icons.
@@ -244,9 +245,11 @@ Blockly.Block.prototype.getIcons = function() {
   if (this.errorIcon) {
     icons.push(this.errorIcon);
   }
-  var textBubbleKeys = Object.keys(this.textBubbles);  //emery
-  for (var i = 0, key; key = textBubbleKeys[i]; i++) {
-    icons.push(this.textBubbles[key]);
+    var textBubbleKeys = Object.keys(this.textBubbles);  //emery
+    for (var i = 0, key; key = textBubbleKeys[i]; i++) {
+      if (this.textBubbles[key]) {
+        icons.push(this.textBubbles[key]);
+      }
   }
   return icons;
 };
@@ -787,7 +790,6 @@ Blockly.Block.prototype.showContextMenu_ = function(e) {
           block.setCommentText('');
         };
       }
-      console.log("icons: " + this.getIcons());
       options.push(commentOption);
     }
 
@@ -2019,6 +2021,8 @@ Blockly.Block.prototype.setCommentText = function(text) {
       changedState = true;
     }
   }
+  console.log(this.comment);
+  console.log(this.getIcons());
   if (this.rendered) {
     this.render();
     if (changedState) {
@@ -2037,9 +2041,9 @@ Blockly.Block.prototype.setCommentText = function(text) {
  * @return {string} the text associated with the textBubble.
  */
 Blockly.Block.prototype.getTextBubbleText = function(iconChar) {
-  var textBubble = this.textBubbles[iconChar];
-  if (textBubble) { //emery was this.comment or something
-    var text = textBubble.getText();
+  this.textBubble = this.textBubbles[iconChar];
+  if (this.textBubble) { //emery was this.comment or something
+    var text = this.textBubble.getText();
     // Trim off trailing whitespace.
     return text.replace(/\s+$/, '').replace(/ +\n/g, '\n');
   }
@@ -2071,10 +2075,12 @@ Blockly.Block.prototype.setTextBubbleText = function(iconChar, text) {
     textBubble.setText(/** @type {string} */ (text));
   } else {
     if (textBubble) {
-      this.comment.dispose();
+      textBubble.dispose();
       changedState = true;
     }
   }
+  console.log(textBubble);
+  console.log(this.getIcons());
   if (this.rendered) {
     this.render();
     if (changedState) {
