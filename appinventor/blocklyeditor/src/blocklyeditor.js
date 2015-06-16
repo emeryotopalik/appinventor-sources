@@ -259,10 +259,6 @@ Blockly.Block.prototype.customContextMenu = function(options) {
   options.push(watchOption);
 }
 
-
-
-
-
   if(myBlock.procCustomContextMenu){
     myBlock.procCustomContextMenu(options);
   }

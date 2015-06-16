@@ -194,8 +194,12 @@ Blockly.Comment.prototype.clearButtonClick_ = function(e) {
 Blockly.Comment.prototype.toggleButtonClick_ = function(e) {
   if (this.myblock.watch) {
     this.myblock.watch = false;
-    this.myblock.setTextBubbleText(Blockly.BlocklyEditor.watchChar, "------\n" +
-        this.myblock.getTextBubbleText(Blockly.BlocklyEditor.watchChar));
+    var text = this.myblock.getTextBubbleText(Blockly.BlocklyEditor.watchChar)
+    if (this.myblock.order) {
+      this.myblock.setTextBubbleText(Blockly.BlocklyEditor.watchChar, "------\n" + text);
+    } else {
+      this.myblock.setTextBubbleText(Blockly.BlocklyEditor.watchChar, text + "\n------");
+    }
     this.toggleButton_.innerHTML = "Turn Watch On";
   } else {
     this.toggleButton_.innerHTML = "Turn Watch Off";
