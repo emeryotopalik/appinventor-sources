@@ -46,8 +46,8 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Icon}
  * @constructor
  */
-//Blockly.Comment = function(block) {    //emery
 Blockly.Comment = function(block, opt_iconChar, opt_clearable, opt_endable, opt_doable) {
+  // options added for different comment boxes: Yail, Watch, DoIt, Standard Comment
   this.myblock = block; // added
   this.iconChar = opt_iconChar ? opt_iconChar : '?';      //added
   this.clearable = opt_clearable ? true : false;                 //added
@@ -128,7 +128,7 @@ Blockly.Comment.prototype.createEditor_ = function() {
   body.appendChild(this.closeButton_);
   Blockly.bindEvent_(this.closeButton_, 'mouseup', this, this.closeButtonClick_);  //emery
 
-  // [lyn, 08/18/2014] new clear button //emery
+  // [lyn, 08/18/2014] [edited by emery, 06/2015] new clear button
   if (this.clearable) {
     this.clearButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
     this.clearButton_.appendChild(document.createTextNode('Clear'));
@@ -139,11 +139,18 @@ Blockly.Comment.prototype.createEditor_ = function() {
   // [emery, 06/10/2015] new toggle watch button
   if (this.endable) {
     this.toggleButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
-    this.toggleButton_.appendChild(document.createTextNode('Toggle Watch'));
+    this.toggleButton_.appendChild(document.createTextNode('Turn Watch Off'));
     body.appendChild(this.toggleButton_);
     Blockly.bindEvent_(this.toggleButton_, 'mouseup', this, this.toggleButtonClick_);  //emery
+
+    this.orderButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
+    this.orderButton_.appendChild(document.createTextNode('Print From Bottom'));
+    body.appendChild(this.orderButton_);
+    Blockly.bindEvent_(this.orderButton_, 'mouseup', this, this.orderButtonClick_);
+    this.myblock.order = true;
   }
 
+  // [emery, 06/2015[ new Do It Again button
   if (this.doable) {
     this.doitButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
     this.doitButton_.appendChild(document.createTextNode('Do It Again'));
@@ -160,8 +167,8 @@ Blockly.Comment.prototype.createEditor_ = function() {
   return this.foreignObject_;
 };
 
-/**
- * Close Button: Emery
+/*
+ * Close Button: Emery 6/9/15
  */
 Blockly.Comment.prototype.closeButtonClick_ = function(e) {
   if (this.iconChar == Blockly.BlocklyEditor.watchChar) {
@@ -172,36 +179,53 @@ Blockly.Comment.prototype.closeButtonClick_ = function(e) {
   } else {
     this.myblock.setTextBubbleText(this.iconChar, null);
   }
-  //  this.dispose();
-   // if (this.myblock.rendered) {
-    //  this.myblock.render();
-     // this.myblock.bumpNeighbours_();
-    //}
 }
 
-/**
+/*
  * Clear Button: Emery 6/9/15
  */
 Blockly.Comment.prototype.clearButtonClick_ = function(e) {
   this.setText('');
 }
 
-/**
+/*
  * Toggle Watch Button: Emery 6/10/15
  */
-Blockly.Comment.prototype.toggleButtonClick_ = function (e) {
+Blockly.Comment.prototype.toggleButtonClick_ = function(e) {
   if (this.myblock.watch) {
     this.myblock.watch = false;
     this.myblock.setTextBubbleText(Blockly.BlocklyEditor.watchChar, "------\n" +
         this.myblock.getTextBubbleText(Blockly.BlocklyEditor.watchChar));
+    this.toggleButton_.innerHTML = "Turn Watch On";
   } else {
-    //this.myblock.setTextBubbleText(Blockly.BlocklyEditor.watchChar, "------\n" +
-      //  this.myblock.getTextBubbleText(Blockly.BlocklyEditor.watchChar));
+    this.toggleButton_.innerHTML = "Turn Watch Off";
     this.myblock.watch = true;
   }
 }
 
-Blockly.Comment.prototype.doitAgainButtonClick_ = function (e) {
+/*
+ * Order Button: Emery 6/16/15
+ */
+Blockly.Comment.prototype.orderButtonClick_ = function(e) {
+  this.myblock.order = !this.myblock.order;
+  var text = this.getText();
+  var split = text.split("\n");
+  var string = '';
+  for (var i = 0; i < split.length; i++) {
+    string = split[i] + "\n" + string;
+  }
+  this.setText(string);
+  if (this.orderButton_.innerHTML == "Print From Bottom") {
+    this.orderButton_.innerHTML = "Print From Top";
+  } else {
+    this.orderButton_.innerHTML = "Print From Bottom";
+  }
+}
+
+/*
+ * Do It Again Button: Emery 6/10/15
+ */
+Blockly.Comment.prototype.doitAgainButtonClick_ = function(e) {
   this.myblock.doit = true;
   var yailText;
   var yailTextOrArray = Blockly.Yail.blockToCode1(this.myblock);
@@ -346,6 +370,7 @@ Blockly.Comment.prototype.setText = function(text) {
 
 /**
  * Dispose of this comment.
+ * [edited by emery, 6/15/15], include textBubble case
  */
 Blockly.Comment.prototype.dispose = function() {
   if (this.iconChar == Blockly.BlocklyEditor.commentChar) {

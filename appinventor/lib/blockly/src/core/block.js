@@ -245,7 +245,7 @@ Blockly.Block.prototype.getIcons = function() {
   if (this.errorIcon) {
     icons.push(this.errorIcon);
   }
-    var textBubbleKeys = Object.keys(this.textBubbles);  //emery
+    var textBubbleKeys = Object.keys(this.textBubbles);
     for (var i = 0, key; key = textBubbleKeys[i]; i++) {
       if (this.textBubbles[key]) {
         icons.push(this.textBubbles[key]);
@@ -2034,7 +2034,7 @@ Blockly.Block.prototype.setCommentText = function(text) {
 
 
 /**
- * [lyn, 08/05/2104] Returns the text from the text bubble with this key (or '' if none).
+ * [lyn, 08/05/2104] [edited by emery, 06/2015] Returns the text from the text bubble with this key (or '' if none).
  * @param {?string} iconChar: the single-character string used to represent the bubble
  *   and index it in this.textBubbles.
  * Note: this could be used to replace comments, by using '?' iconChar.
@@ -2042,7 +2042,7 @@ Blockly.Block.prototype.setCommentText = function(text) {
  */
 Blockly.Block.prototype.getTextBubbleText = function(iconChar) {
   this.textBubble = this.textBubbles[iconChar];
-  if (this.textBubble) { //emery was this.comment or something
+  if (this.textBubble) {
     var text = this.textBubble.getText();
     // Trim off trailing whitespace.
     return text.replace(/\s+$/, '').replace(/ +\n/g, '\n');
@@ -2051,7 +2051,7 @@ Blockly.Block.prototype.getTextBubbleText = function(iconChar) {
 };
 
 /**
- * [lyn, 08/05/2104]
+ * [lyn, 08/05/2104] [edited by emery, 06/2015]
  * Set this block's textBubble text, indexed by iconChar.
  * @param {?string} iconChar: the single-character string used to represent the bubble
  *   and index it in this.textBubbles.
@@ -2062,7 +2062,8 @@ Blockly.Block.prototype.setTextBubbleText = function(iconChar, text) {
   var changedState = false;
   if (goog.isString(text)) {
     if (!textBubble) {
-      if (iconChar == Blockly.BlocklyEditor.watchChar) { // to include endwatch button emery
+      // separate options for adding certain buttons
+      if (iconChar == Blockly.BlocklyEditor.watchChar) {
         textBubble = new Blockly.Comment(this, iconChar, true, true, false);
       } else if (iconChar == Blockly.BlocklyEditor.doitChar) {
           textBubble = new Blockly.Comment(this, iconChar, true, false, true);
@@ -2072,15 +2073,22 @@ Blockly.Block.prototype.setTextBubbleText = function(iconChar, text) {
       this.textBubbles[iconChar] = textBubble;
       changedState = true;
     }
-    textBubble.setText(/** @type {string} */ (text));
+    // Watch originated from DoIt, so it prints off the first value automatically like a doit. This will ignore
+    // the first value and clear up any confusion.
+    if (iconChar == Blockly.BlocklyEditor.watchChar) {
+       if (this.watchIgnore) {
+         textBubble.setText(/** @type {string} */ (text));
+       }
+      this.watchIgnore = true;
+    } else {
+      textBubble.setText(/** @type {string} */ (text));
+    }
   } else {
     if (textBubble) {
       textBubble.dispose();
       changedState = true;
     }
   }
-  console.log(textBubble);
-  console.log(this.getIcons());
   if (this.rendered) {
     this.render();
     if (changedState) {

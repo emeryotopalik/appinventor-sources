@@ -578,9 +578,6 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                if (r.status == "OK") {
                    block.replError = null;
                    if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
-                       //      if (block.watch) { //JOHANNA
-                       //        this.appendToWatchResult(block, r.value);
-                       //  } else { // need a way to differentiate between doit and end watch
                        if (block.doit) {
                            this.setDoitResult(block, r.value);
                            block.doit = false;
@@ -588,14 +585,6 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                                this.appendToWatchResult(block, r.value);
                        }
                    }
-                   //}
-              /* } else if (r.status == "WATCH") {  //emery
-                   block.replError = null;
-                   if (r.value && ((r.value != '*nothing*') && (r.value != "noError"))) { //Johanna [12.5.13] added noError
-                    if (block.watch) {
-                        this.appendToWatchResult(block, r.value);
-                    }
-                   } */
                } else {
                     if (r.value) {
                         block.replError = Blockly.Msg.REPL_ERROR_FROM_COMPANION + ": " + r.value;
@@ -675,12 +664,16 @@ Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
      } */
     var separator = "";
     if (block.getTextBubbleText(Blockly.BlocklyEditor.watchChar)) {
-        separator = "\n" + block.getTextBubbleText(Blockly.BlocklyEditor.watchChar);
+        separator = block.getTextBubbleText(Blockly.BlocklyEditor.watchChar);
         // If we don't set visible to false, the comment
         // doesn't always change when it should...
       //   this.textBubbles[Blockly.BlocklyEditor.watchChar].setVisible(false);
     }
-    block.setTextBubbleText(Blockly.BlocklyEditor.watchChar, value + separator);
+    if (block.order) {
+        block.setTextBubbleText(Blockly.BlocklyEditor.watchChar, value + "\n" + separator);
+    } else {
+        block.setTextBubbleText(Blockly.BlocklyEditor.watchChar, separator + "\n" + value);
+    }
    // this.textBubbles[Blockly.BlocklyEditor.watchChar].setVisible(true);
 }
 

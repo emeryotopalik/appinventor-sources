@@ -169,15 +169,16 @@ Blockly.BlocklyEditor.render = function() {
  * the block's comment (if it has one) for now.
  * TODO: eventually create a separate kind of bubble for the generated yail, which can morph into
  * the bubble for "do it" output once we hook up to the REPL.
+ *
+ * [edited by emery, 6/2015] to add doit and watch tags to better differentiate between the two.
+ * Also added error message for Watch.
  */
 Blockly.Block.prototype.customContextMenu = function(options) {
 
   var myBlock = this;
 
   var doitOption = {enabled: this.disabled ? false : true};
-  //var watchOption = {enabled:true};
   var watchOption = {enabled: this.disabled ? false : true}; //JOHANNA
-  //var endWatchOption = {enabled: this.disabled ? false : true}; //Emery
 
   if (window.parent.BlocklyPanel_checkIsAdmin()) {
     var yailOption = {enabled: this.disabled ? false : true};
@@ -201,7 +202,6 @@ Blockly.Block.prototype.customContextMenu = function(options) {
      doitOption.text = Blockly.Msg.DO_IT;
      doitOption.callback = function () {
 
-       // myBlock.watch = false; //Emery
        myBlock.doit = true;
        var yailText;
        //Blockly.Yail.blockToCode1 returns a string if the block is a statement
@@ -229,23 +229,13 @@ Blockly.Block.prototype.customContextMenu = function(options) {
      options.push(doitOption);
 
 
-   if (myBlock.watch) {
-  /* endWatchOption.text = Blockly.Msg.END_WATCH; //Emery
-   endWatchOption.callback = function () {
-   myBlock.watch = false;
-   myBlock.doit = false;              */
-  //  myBlock.setVisible(true); emery
-
-
-  //options.push(endWatchOption);
-  } else {
-  //watchOption = {enabled:true};
+   if (!myBlock.watch) {
   watchOption.text = Blockly.Msg.WATCH; //JOHANNA
-  watchOption.callback = function () {     // check to see if connected like in do it?
+  watchOption.callback = function () {
     var yailText;
     var yailTextOrArray = Blockly.Yail.blockToCode(myBlock);
     var dialog;
-    if (window.parent.ReplState.state != Blockly.ReplMgr.rsState.CONNECTED) {  //Emery (like above for doit)
+    if (window.parent.ReplState.state != Blockly.ReplMgr.rsState.CONNECTED) {
       dialog = new goog.ui.Dialog(null, true);
       dialog.setTitle(Blockly.Msg.CAN_NOT_WATCH);
       dialog.setContent(Blockly.Msg.CONNECT_TO_WATCH);
@@ -259,18 +249,11 @@ Blockly.Block.prototype.customContextMenu = function(options) {
       } else {
         yailText = yailTextOrArray;
       }
-      console.log("WATCH");
-      console.log(yailText);
-      //var watchYail = "(watch " + yailText + ")";
       myBlock.watch = true;
-      //myBlock.doit = false;
-      //myBlock.replError = "(watch)";
-      //   myBlock.setCommentText(""); // resetting to blank before setting to updated list
-      //myBlock.comment = new Blockly.Comment(myBlock);
-      //myBlock.comment.setCommentText("");//emery
+      myBlock.watchIgnore = false;
+
       Blockly.ReplMgr.putYail(yailText, myBlock);
 
-      //myBlock.setVisible(true); Emery
     }
   };
   options.push(watchOption);
