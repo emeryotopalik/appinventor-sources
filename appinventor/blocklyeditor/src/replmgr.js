@@ -582,7 +582,7 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                            this.setDoitResult(block, r.value);
                            block.doit = false;
                        } else if (block.watch) {
-                               this.appendToWatchResult(block, r.value);
+                           this.appendToWatchResult(block, r.value);
                        }
                    }
                } else {
