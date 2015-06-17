@@ -154,7 +154,7 @@ Blockly.Generator.prototype.blockToCode = function(block) {
   // The current prefered method of accessing the block is through the second
   // argument to func.call, which becomes the first parameter to the generator.
   var code = func.call(block, block);
-  if (goog.isArray(code)) {   // edited by Emery to include watch function, 6/2/15
+  if (goog.isArray(code)) {
     // Value blocks return tuples of code and operator order.
     var generatedCode = code[0];
     if (block.watch) {
@@ -180,7 +180,7 @@ Blockly.Generator.prototype.blockToCode = function(block) {
     // console.log("scrub " + this.scrub_(block, code));
     var result = this.scrub_(block, "(augment " + block.id + " " + code + ")");
     //console.log("Output code " + result);
-    return result;
+    //return result;
     return this.scrub_(block, code);
   } else if (code === null) {
     // Block has handled code generation itself.
