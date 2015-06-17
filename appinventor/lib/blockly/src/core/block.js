@@ -784,8 +784,6 @@ Blockly.Block.prototype.showContextMenu_ = function(e) {
           block.setCommentText(null);
         };
       } else {
-        commentOption = {enabled: true};
-        commentOption.text = Blockly.Msg.ADD_COMMENT;
         commentOption.callback = function() {
           block.setCommentText('');
         };
