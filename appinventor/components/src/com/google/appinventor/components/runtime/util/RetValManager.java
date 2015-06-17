@@ -51,7 +51,7 @@ public class RetValManager {
         retval.put("status", ok);
         retval.put("type", "return");
         retval.put("value", item);
-        retval.put("blockid", blockid);
+       // retval.put("blockid", blockid);
       } catch (JSONException e) {
         Log.e(LOG_TAG, "Error building retval", e);
         return;
