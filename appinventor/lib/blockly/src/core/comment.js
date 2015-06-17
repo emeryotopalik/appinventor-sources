@@ -46,13 +46,10 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Icon}
  * @constructor
  */
-Blockly.Comment = function(block, opt_iconChar, opt_clearable, opt_endable, opt_doable) {
+Blockly.Comment = function(block, opt_iconChar) {
   // options added for different comment boxes: Yail, Watch, DoIt, Standard Comment
   this.myblock = block; // added
   this.iconChar = opt_iconChar ? opt_iconChar : '?';      //added
-  this.clearable = opt_clearable ? true : false;                 //added
-  this.endable = opt_endable ? true : false;                       //added
-  this.doable = opt_doable ? true : false;
   Blockly.Comment.superClass_.constructor.call(this, block);
   this.createIcon_();
 };
@@ -124,20 +121,32 @@ Blockly.Comment.prototype.createEditor_ = function() {
 
   //[emery, 06/10/2015] new close button
   this.closeButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
-  this.closeButton_.appendChild(document.createTextNode('Close'));
+  if (this.iconChar == Blockly.BlocklyEditor.watchChar) {
+  this.closeButton_.appendChild(document.createTextNode('Remove Watch'));
+} else if (this.iconChar == Blockly.BlocklyEditor.doitChar) {
+  this.closeButton_.appendChild(document.createTextNode('Remove Do It'));
+} else if (this.iconChar == Blockly.BlocklyEditor.yailChar) {
+  this.closeButton_.appendChild(document.createTextNode('Remove Yail'));
+} else {
+  this.closeButton_.appendChild(document.createTextNode('Remove Comment'));
+}
   body.appendChild(this.closeButton_);
   Blockly.bindEvent_(this.closeButton_, 'mouseup', this, this.closeButtonClick_);  //emery
 
+  //[emery, 06/10/2015] new hide button
+  this.hideButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
+  this.hideButton_.appendChild(document.createTextNode('Hide'));
+  body.appendChild(this.hideButton_);
+  Blockly.bindEvent_(this.hideButton_, 'mouseup', this, Blockly.Icon.prototype.iconClick_ );
+
   // [lyn, 08/18/2014] [edited by emery, 06/2015] new clear button
-  if (this.clearable) {
     this.clearButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
     this.clearButton_.appendChild(document.createTextNode('Clear'));
     body.appendChild(this.clearButton_);
     Blockly.bindEvent_(this.clearButton_, 'mouseup', this, this.clearButtonClick_);  //emery
-  }
 
   // [emery, 06/10/2015] new toggle watch button
-  if (this.endable) {
+  if (this.iconChar == Blockly.BlocklyEditor.watchChar) {
     this.toggleButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
     this.toggleButton_.appendChild(document.createTextNode('Turn Watch Off'));
     body.appendChild(this.toggleButton_);
@@ -151,11 +160,19 @@ Blockly.Comment.prototype.createEditor_ = function() {
   }
 
   // [emery, 06/2015[ new Do It Again button
-  if (this.doable) {
+  if (this.iconChar == Blockly.BlocklyEditor.doitChar) {
     this.doitButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
     this.doitButton_.appendChild(document.createTextNode('Do It Again'));
     body.appendChild(this.doitButton_);
     Blockly.bindEvent_(this.doitButton_, 'mouseup', this, this.doitAgainButtonClick_);  //emery
+  }
+
+  // [emery, 06/2015[ new Regenerate Yail Button
+  if (this.iconChar == Blockly.BlocklyEditor.yailChar) {
+    this.yailButton_ = document.createElementNS(Blockly.HTML_NS, 'button');
+    this.yailButton_.appendChild(document.createTextNode('Regenerate'));
+    body.appendChild(this.yailButton_);
+    Blockly.bindEvent_(this.yailButton_, 'mouseup', this, this.yailButtonClick_);
   }
 
   this.textarea_ = document.createElementNS(Blockly.HTML_NS, 'textarea');
@@ -177,9 +194,10 @@ Blockly.Comment.prototype.closeButtonClick_ = function(e) {
   if (this.iconChar == Blockly.BlocklyEditor.commentChar) {
     this.myblock.setCommentText(null);
   } else {
-    this.myblock.setTextBubbleText(this.iconChar, null);
+  this.myblock.setTextBubbleText(this.iconChar, null);
   }
 }
+
 
 /*
  * Clear Button: Emery 6/9/15
@@ -240,6 +258,23 @@ Blockly.Comment.prototype.doitAgainButtonClick_ = function(e) {
   }
   Blockly.ReplMgr.putYail(yailText, this.myblock);
 }
+
+/*
+ * Regenerate Yail Button: Emery 6/10/15
+ */
+Blockly.Comment.prototype.yailButtonClick_ = function(e) {
+  var yailText;
+  //Blockly.Yail.blockToCode1 returns a string if the block is a statement
+  //and an array if the block is a value
+  var yailTextOrArray = Blockly.Yail.blockToCode1(this.myblock);
+  if (yailTextOrArray instanceof Array) {
+    yailText = yailTextOrArray[0];
+  } else {
+    yailText = yailTextOrArray;
+  }
+  this.setText(yailText);
+}
+
 
 /**
  * Add or remove editability of the comment.

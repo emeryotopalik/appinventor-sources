@@ -2012,7 +2012,7 @@ Blockly.Block.prototype.setCommentText = function(text) {
   var changedState = false;
   if (goog.isString(text)) {
     if (!this.comment) {
-      this.comment = new Blockly.Comment(this, Blockly.BlocklyEditor.commentChar, true, false, false);
+      this.comment = new Blockly.Comment(this, Blockly.BlocklyEditor.commentChar);
       changedState = true;
     }
     this.comment.setText(/** @type {string} */ (text));
@@ -2063,14 +2063,7 @@ Blockly.Block.prototype.setTextBubbleText = function(iconChar, text) {
   var changedState = false;
   if (goog.isString(text)) {
     if (!textBubble) {
-      // separate options for adding certain buttons
-      if (iconChar == Blockly.BlocklyEditor.watchChar) {
-        textBubble = new Blockly.Comment(this, iconChar, true, true, false);
-      } else if (iconChar == Blockly.BlocklyEditor.doitChar) {
-          textBubble = new Blockly.Comment(this, iconChar, true, false, true);
-      } else {
-      textBubble = new Blockly.Comment(this, iconChar, true, false, false);
-    }
+      textBubble = new Blockly.Comment(this, iconChar);
       this.textBubbles[iconChar] = textBubble;
       changedState = true;
     }
