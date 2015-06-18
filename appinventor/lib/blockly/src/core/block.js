@@ -2068,10 +2068,11 @@ Blockly.Block.prototype.setTextBubbleText = function(iconChar, text) {
     // Watch originated from DoIt, so it prints off the first value automatically like a doit. This will ignore
     // the first value and clear up any confusion.
     if (iconChar == Blockly.BlocklyEditor.watchChar) {
-       if (this.watchIgnore) {
+       if (!this.watchIgnore) {
          textBubble.setText(/** @type {string} */ (text));
+       } else {
+         this.watchIgnore = false;
        }
-      this.watchIgnore = true;
     } else {
       textBubble.setText(/** @type {string} */ (text));
     }

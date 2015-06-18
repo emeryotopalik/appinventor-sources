@@ -230,37 +230,38 @@ Blockly.Block.prototype.customContextMenu = function(options) {
      options.push(doitOption);
 
    // Watch option added by Johanna
-   if (!myBlock.watch) {
-    watchOption.text = Blockly.Msg.WATCH;
-    watchOption.callback = function () {
-    var yailText;
-    var yailTextOrArray = Blockly.Yail.blockToCode(myBlock);
-    var dialog;
-    if (window.parent.ReplState.state != Blockly.ReplMgr.rsState.CONNECTED) {
-      dialog = new goog.ui.Dialog(null, true);
-      dialog.setTitle(Blockly.Msg.CAN_NOT_WATCH);
-      dialog.setContent(Blockly.Msg.CONNECT_TO_WATCH);
-      dialog.setButtonSet(new goog.ui.Dialog.ButtonSet().
-          addButton(goog.ui.Dialog.ButtonSet.DefaultButtons.OK,
-          false, true));
-      dialog.setVisible(true);
-    } else {
-      if (yailTextOrArray instanceof Array) {
-        yailText = yailTextOrArray[0];
-      } else {
-        yailText = yailTextOrArray;
-      }
-      myBlock.watch = true;
-      // watch originated from doit, so the initial return value will be a doit.
-      // used this tag to ignore the doit and only print the following watch values
-      myBlock.watchIgnore = false;
+    // second case is for aesthetic, so statement blocks do not react.
+   if (!myBlock.watch || !myBlock.textBubbles[Blockly.BlocklyEditor.watchChar]) {
+     watchOption.text = Blockly.Msg.WATCH;
+     watchOption.callback = function () {
+       // watch originated from doit, so the initial return value will be a doit.
+       // used this tag to ignore the doit and only print the following watch values
+       myBlock.watchIgnore = true;
+       var yailText;
+       var yailTextOrArray = Blockly.Yail.blockToCode(myBlock);
+       var dialog;
+       if (window.parent.ReplState.state != Blockly.ReplMgr.rsState.CONNECTED) {
+         dialog = new goog.ui.Dialog(null, true);
+         dialog.setTitle(Blockly.Msg.CAN_NOT_WATCH);
+         dialog.setContent(Blockly.Msg.CONNECT_TO_WATCH);
+         dialog.setButtonSet(new goog.ui.Dialog.ButtonSet().
+             addButton(goog.ui.Dialog.ButtonSet.DefaultButtons.OK,
+             false, true));
+         dialog.setVisible(true);
+       } else {
+         if (yailTextOrArray instanceof Array) {
+           yailText = yailTextOrArray[0];
+         } else {
+           yailText = yailTextOrArray;
+         }
+         myBlock.watch = true;
 
-      Blockly.ReplMgr.putYail(yailText, myBlock);
+         Blockly.ReplMgr.putYail(yailText, myBlock);
 
-    }
-  };
-  options.push(watchOption);
-}
+       }
+     };
+     options.push(watchOption);
+   }
 
   if(myBlock.procCustomContextMenu){
     myBlock.procCustomContextMenu(options);
