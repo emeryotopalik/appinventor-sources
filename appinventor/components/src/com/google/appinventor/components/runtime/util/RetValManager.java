@@ -51,7 +51,7 @@ public class RetValManager {
         retval.put("status", ok);
         retval.put("type", "return");
         retval.put("value", item);
-       // retval.put("blockid", blockid);
+        retval.put("blockid", blockid);
       } catch (JSONException e) {
         Log.e(LOG_TAG, "Error building retval", e);
         return;
@@ -64,15 +64,13 @@ public class RetValManager {
     }
   }
 
-  public static void sendError(String error, String blockid) { 
-    //[12.2.13] Johanna added blockid to send error message to block
+  public static void sendError(String error) {
     synchronized (semaphore) {
       JSONObject retval = new JSONObject();
       try {
         retval.put("status", "OK");
         retval.put("type", "error");
         retval.put("value", error);
-        retval.put("blockid", blockid);
       } catch (JSONException e) {
         Log.e(LOG_TAG, "Error building retval", e);
         return;

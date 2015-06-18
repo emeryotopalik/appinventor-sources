@@ -156,13 +156,13 @@ Blockly.Generator.prototype.blockToCode = function(block) {
   var code = func.call(block, block);
   if (goog.isArray(code)) {
     // Value blocks return tuples of code and operator order.
-    return [this.scrub_(block, code[0]), code[1]];
-   /* var generatedCode = code[0];
+   // return [this.scrub_(block, code[0]), code[1]];
+    var generatedCode = code[0];
     if (block.watch) {
-      generatedCode = "(watch " + block.id + " " + generatedCode + ")";
-    } else {
+      generatedCode = " (watch " + block.id + " " + generatedCode + ")";
+    } /*else {
       generatedCode =  "(augment " + block.id + " " + generatedCode + ")";
-    }
+    } */
     return [this.scrub_(block, generatedCode), code[1]];
     //[12.2.13] added augment tag to keep track of block id when yail is sent to device
    // var result = [this.scrub_(block, "(augment " + block.id + " " + code[0] + ")"), code[1]];
@@ -171,17 +171,16 @@ Blockly.Generator.prototype.blockToCode = function(block) {
     //return ["(augment " + block.id + " " + (this.scrub_(block, code[0])) + ")", code[1]]; */
   } else if (goog.isString(code)) {
    /* if (block.watch) {
-      code = "(watch " + block.id + " " +  code +")";
+      code =  " (watch " + block.id + " " +  code + ")";
     }*/
     if (this.STATEMENT_PREFIX) {
       code = this.STATEMENT_PREFIX.replace(/%1/g, '\'' + block.id + '\'') +
           code;
     }
-  /*  //console.log("Input code " + code);
+    //console.log("Input code " + code);
     // console.log("scrub " + this.scrub_(block, code));
-    var result = this.scrub_(block, "(augment " + block.id + " " + code + ")");
+    //var result = this.scrub_(block, "(augment " + block.id + " " + code + ")");
     //console.log("Output code " + result);
-    //return result;  */
     return this.scrub_(block, code);
   } else if (code === null) {
     // Block has handled code generation itself.

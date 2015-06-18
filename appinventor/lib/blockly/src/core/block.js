@@ -777,13 +777,13 @@ Blockly.Block.prototype.showContextMenu_ = function(e) {
     if (this.isEditable() && !this.collapsed_ && Blockly.comments) {
       // Option to add/remove a comment.
       var commentOption = {enabled: true};
-      if (this.comment) {  //emery
-        //commentOption = {enabled: false};
+      if (this.comment) {
         commentOption.text = Blockly.Msg.REMOVE_COMMENT;
         commentOption.callback = function() {
           block.setCommentText(null);
         };
       } else {
+        commentOption.text = Blockly.Msg.ADD_COMMENT;
         commentOption.callback = function() {
           block.setCommentText('');
         };

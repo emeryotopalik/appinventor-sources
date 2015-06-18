@@ -582,7 +582,7 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                 block = Blockly.mainWorkspace.getBlockById(r.blockid);
                if (r.status == "OK") {
                    block.replError = null;
-                   if (r.value && (r.value != '*nothing*')) { //Johanna [12.5.13] added noError
+                   if (r.value && (r.value != '*nothing*')) {
                        if (block.doit) {
                            this.setDoitResult(block, r.value);
                            block.doit = false;
@@ -610,41 +610,8 @@ Blockly.ReplMgr.processRetvals = function(responses) {
             window.parent.BlocklyPanel_popScreen();
             break;
         case "error":
-            // Old version that pops up error in middle of blocks editor.
-            // console.log("processRetVals: Error value = " + r.value);
-            // runtimeerr(escapeHTML(r.value) + Blockly.Msg.REPL_NO_ERROR_FIVE_SECONDS);
-            console.log("Blockly.ReplMgr.processRetvals: error for block " + r.blockid); //JOHANNA
-            if (r.blockid != -1) {
-                block = Blockly.mainWorkspace.getBlockById(r.blockid);
-                block.replError = "Error from Companion: " + r.value;
-
-                block.setErrorIconText("Error from Companion " + r.value); 
-                var rootBlock;
-                var current = block;
-                do {
-                    // uncollapse collapsed blocks
-                    if (current.collapsed){
-                        current.setCollapsed(false);
-                    }
-                    rootBlock = current;
-                    current = rootBlock.parentBlock_;
-                } while (current);
-
-                block.errorIcon.setVisible(true);
-
-            } else { // Not associated with particular block; put up Jeff's dialog
-                if (!this.runtimeError) {
-                    this.runtimeError = new goog.ui.Dialog(null, true);
-                }
-                if (this.runtimeError.isVisible()) {
-                    this.runtimeError.setVisible(false);
-                }
-                this.runtimeError.setTitle("Runtime Error");
-                this.runtimeError.setButtonSet(new goog.ui.Dialog.ButtonSet().
-                                               addButton({caption:"Dismiss"}, false, true));
-                this.runtimeError.setContent(r.value + "<br/><i>Note:</i>&nbsp;You will not see another error reported for 5 seconds.");
-                this.runtimeError.setVisible(true);
-            }
+            console.log("processRetVals: Error value = " + r.value);
+            runtimeerr(escapeHTML(r.value) + Blockly.Msg.REPL_NO_ERROR_FIVE_SECONDS);
         }
     }
     Blockly.WarningHandler.checkAllBlocksForWarningsAndErrors();
