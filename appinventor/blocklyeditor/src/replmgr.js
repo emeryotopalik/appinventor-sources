@@ -586,8 +586,9 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                        if (block.doit) {
                            this.setDoitResult(block, r.value);
                            block.doit = false;
+                           // [johanna, edited by emery, 6/15] added watch case
                        } else if (block.watch) {
-                           this.appendToWatchResult(block, r.value);
+                           this.appendToWatchResult(block, r.value); // place value on block
                        }
                    }
                } else {
@@ -617,21 +618,22 @@ Blockly.ReplMgr.processRetvals = function(responses) {
     Blockly.WarningHandler.checkAllBlocksForWarningsAndErrors();
 };
 
-
-Blockly.ReplMgr.appendToWatchResult = function(block, value) { //JOHANNA
+// [johanna, edited by emery, 6/15] places the given value in the textBubble connected to the tagged block
+Blockly.ReplMgr.appendToWatchResult = function(block, value) {
     var separator = "";
     if (block.getTextBubbleText(Blockly.BlocklyEditor.watchChar)) {
         separator = block.getTextBubbleText(Blockly.BlocklyEditor.watchChar);
     }
     if (block.order) {
+        // if the order is most recent at top (default)
         block.setTextBubbleText(Blockly.BlocklyEditor.watchChar, value + "\n" + separator);
     } else {
+        // if the order is most recent at bottom
         block.setTextBubbleText(Blockly.BlocklyEditor.watchChar, separator + "\n" + value);
     }
 }
 
-
-
+// [edited by emery, 6/15] places the value in the doit textBubble. Consecutive do its can be seen at once.
 Blockly.ReplMgr.setDoitResult = function(block, value) {
     var separator = "";
     if  (block.getTextBubbleText(Blockly.BlocklyEditor.doitChar)) {

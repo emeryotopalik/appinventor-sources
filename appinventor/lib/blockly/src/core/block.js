@@ -160,7 +160,7 @@ Blockly.Block.prototype.fill = function(workspace, prototypeName) {
    * Maps a string key to an instance of Blockly.Comment.
    * @type {Blockly.Comment}
    */
-  this.textBubbles = {}; //emery
+  this.textBubbles = {};
 
   // Copy the type-specific functions and data from the prototype.
   if (prototypeName) {
@@ -245,6 +245,7 @@ Blockly.Block.prototype.getIcons = function() {
   if (this.errorIcon) {
     icons.push(this.errorIcon);
   }
+  // added for taking care of textBubbles dictionary
     var textBubbleKeys = Object.keys(this.textBubbles);
     for (var i = 0, key; key = textBubbleKeys[i]; i++) {
       if (this.textBubbles[key]) {

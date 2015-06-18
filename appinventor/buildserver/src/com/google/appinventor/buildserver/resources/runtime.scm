@@ -2318,6 +2318,7 @@ list, use the make-yail-list constructor with no arguments.
      (in-ui blockid (delay expr)))))
 
 ;; JOHANNA
+;; watch tag for sending watch values between device and blocks editor.
 (define-syntax watch
   (syntax-rules()
     ((_ info exp)

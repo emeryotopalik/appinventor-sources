@@ -48,8 +48,8 @@ goog.require('goog.userAgent');
  */
 Blockly.Comment = function(block, opt_iconChar) {
   // options added for different comment boxes: Yail, Watch, DoIt, Standard Comment
-  this.myblock = block; // added
-  this.iconChar = opt_iconChar ? opt_iconChar : '?';      //added
+  this.myblock = block; // added for tracking which block the comment is on
+  this.iconChar = opt_iconChar ? opt_iconChar : '?';      //added for tracking which comment on the block we are on
   Blockly.Comment.superClass_.constructor.call(this, block);
   this.createIcon_();
 };

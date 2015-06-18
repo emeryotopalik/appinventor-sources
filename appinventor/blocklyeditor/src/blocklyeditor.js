@@ -193,6 +193,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
       } else {
         yailText = yailTextOrArray;
       }
+      // changed to set to the yail textBubble rather than default comment bubble
       myBlock.setTextBubbleText(Blockly.BlocklyEditor.yailChar, yailText);
     };
     options.push(yailOption);
@@ -202,7 +203,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
      doitOption.text = Blockly.Msg.DO_IT;
      doitOption.callback = function () {
 
-       myBlock.doit = true;
+       myBlock.doit = true;  // to differentiate between watch and doit
        var yailText;
        //Blockly.Yail.blockToCode1 returns a string if the block is a statement
        //and an array if the block is a value
@@ -228,10 +229,10 @@ Blockly.Block.prototype.customContextMenu = function(options) {
      };
      options.push(doitOption);
 
-
+   // Watch option added by Johanna
    if (!myBlock.watch) {
-  watchOption.text = Blockly.Msg.WATCH; //JOHANNA
-  watchOption.callback = function () {
+    watchOption.text = Blockly.Msg.WATCH;
+    watchOption.callback = function () {
     var yailText;
     var yailTextOrArray = Blockly.Yail.blockToCode(myBlock);
     var dialog;
@@ -250,6 +251,8 @@ Blockly.Block.prototype.customContextMenu = function(options) {
         yailText = yailTextOrArray;
       }
       myBlock.watch = true;
+      // watch originated from doit, so the initial return value will be a doit.
+      // used this tag to ignore the doit and only print the following watch values
       myBlock.watchIgnore = false;
 
       Blockly.ReplMgr.putYail(yailText, myBlock);
