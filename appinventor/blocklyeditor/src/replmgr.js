@@ -586,11 +586,11 @@ Blockly.ReplMgr.processRetvals = function(responses) {
                        if (block.doit) {
                            this.setDoitResult(block, r.value);
                            block.doit = false;
-                           // [johanna, edited by emery, 6/15] added watch case
-                       } else if (block.watch) {
-                           this.appendToWatchResult(block, r.value); // place value on block
                        }
                    }
+                   //add watch case
+               } else if (r.status == "WATCH") {
+                   this.appendToWatchResult(block, r.value);
                } else {
                     if (r.value) {
                         block.replError = Blockly.Msg.REPL_ERROR_FROM_COMPANION + ": " + r.value;
@@ -635,12 +635,12 @@ Blockly.ReplMgr.appendToWatchResult = function(block, value) {
 
 // [edited by emery, 6/15] places the value in the doit textBubble. Consecutive do its can be seen at once.
 Blockly.ReplMgr.setDoitResult = function(block, value) {
-    var separator = "";
+    var text = "";
     if  (block.getTextBubbleText(Blockly.BlocklyEditor.doitChar)) {
-    separator = "\n" + block.getTextBubbleText(Blockly.BlocklyEditor.doitChar);
+    text = "\n" + block.getTextBubbleText(Blockly.BlocklyEditor.doitChar);
 
     }
-  block.setTextBubbleText(Blockly.BlocklyEditor.doitChar, value + separator);
+  block.setTextBubbleText(Blockly.BlocklyEditor.doitChar, value + text);
 };
 
 Blockly.ReplMgr.startAdbDevice = function(rs, usb) {

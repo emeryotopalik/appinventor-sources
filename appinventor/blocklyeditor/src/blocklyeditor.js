@@ -225,7 +225,6 @@ Blockly.Block.prototype.customContextMenu = function(options) {
          }
          Blockly.ReplMgr.putYail(yailText, myBlock);
        }
-
      };
      options.push(doitOption);
 
@@ -234,9 +233,6 @@ Blockly.Block.prototype.customContextMenu = function(options) {
    if (!myBlock.watch || !myBlock.textBubbles[Blockly.BlocklyEditor.watchChar]) {
      watchOption.text = Blockly.Msg.WATCH;
      watchOption.callback = function () {
-       // watch originated from doit, so the initial return value will be a doit.
-       // used this tag to ignore the doit and only print the following watch values
-       myBlock.watchIgnore = true;
        var yailText;
        var yailTextOrArray = Blockly.Yail.blockToCode(myBlock);
        var dialog;
@@ -254,10 +250,13 @@ Blockly.Block.prototype.customContextMenu = function(options) {
          } else {
            yailText = yailTextOrArray;
          }
+         // watch originated from doit, so the initial return value will be a doit.
+         // used this tag to ignore the doit and only print the following watch values
+         myBlock.watchIgnore = true;
          myBlock.watch = true;
-
+         // set a blank watch bubble. without this, you have to wait until the first value for the bubble to appear
+         myBlock.setTextBubbleText(Blockly.BlocklyEditor.watchChar, '');
          Blockly.ReplMgr.putYail(yailText, myBlock);
-
        }
      };
      options.push(watchOption);
