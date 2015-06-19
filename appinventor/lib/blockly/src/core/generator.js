@@ -168,7 +168,8 @@ Blockly.Generator.prototype.blockToCode = function(block) {
       code =  " (watch " + block.id + " " +  code + ")";
     }*/
     if (this.STATEMENT_PREFIX) {
-      code = this.STATEMENT_PREFIX.replace(/%1/g, '\'' + block.id + '\'') + code;
+      code = this.STATEMENT_PREFIX.replace(/%1/g, '\'' + block.id + '\'') +
+          code;
     }
     //var result = this.scrub_(block, "(augment " + block.id + " " + code + ")");
     return this.scrub_(block, code);
