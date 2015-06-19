@@ -60,7 +60,7 @@ Blockly.Xml.workspaceToDom = function(workspace) {
  * @return {!Element} Tree of XML elements.
  * @private
  */
-Blockly.Xml.blockToDom_ = function(block) {    //emery
+Blockly.Xml.blockToDom_ = function(block) {
   var element = goog.dom.createDom('block');
   element.setAttribute('type', block.type);
   element.setAttribute('id', block.id);

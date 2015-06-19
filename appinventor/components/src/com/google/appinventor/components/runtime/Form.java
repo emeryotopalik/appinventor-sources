@@ -153,7 +153,6 @@ public class Form extends Activity
 
   // To control volume of error complaints
   private static long minimumToastWait = 10000000000L; // 10 seconds
-  //private static long minimumToastWait = 5000000000L; // 5 seconds
   private long lastToastTime = System.nanoTime() - minimumToastWait;
 
   // In a multiple screen application, when a secondary screen is opened, nextFormName is set to

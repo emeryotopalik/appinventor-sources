@@ -37,12 +37,6 @@ goog.require('goog.userAgent');
  * [08/05/14, lyn] Added 2nd param to support multiple text bubbles on blocks.
  * @param {!String} opt_iconChar: A single character for icon.
  * //above added
- * @param {!boolean} opt_clearable: A single character for icon.
- * //above added
- * @param {!boolean} opt_endable: A single character for icon.
- * //above added
- * @param {!boolean} opt_doable: A single character for icon.
- * //above added
  * @extends {Blockly.Icon}
  * @constructor
  */
