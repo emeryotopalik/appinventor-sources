@@ -349,6 +349,25 @@ Blockly.Blocks['lists_is_list'] = {
   typeblock: [{ translatedName: Blockly.Msg.LANG_LISTS_IS_LIST_TITLE_IS_LIST }]
 };
 
+Blockly.Blocks['lists_to_string'] = {
+  // Make a string from lists with separator between elements
+  category : 'Lists',
+  helpUrl : Blockly.Msg.LANG_LISTS_TO_STRING_HELPURL,
+  init : function() {
+    this.setColour(Blockly.LIST_CATEGORY_HUE);
+    this.setOutput(true, Blockly.Blocks.Utilities.YailTypeToBlocklyType("text", Blockly.Blocks.Utilities.OUTPUT));
+    this.appendValueInput('LIST')
+        .setCheck(Blockly.Blocks.Utilities.YailTypeToBlocklyType("list", Blockly.Blocks.Utilities.INPUT))
+        .appendField(Blockly.Msg.LANG_LISTS_TO_STRING_TITLE_TO_STRING)
+        .appendField(Blockly.Msg.LANG_LISTS_TO_STRING_INPUT_LIST);
+    this.appendValueInput('SEPARATOR')
+        .setCheck(Blockly.Blocks.Utilities.YailTypeToBlocklyType("text", Blockly.Blocks.Utilities.INPUT))
+        .appendField(Blockly.Msg.LANG_LISTS_TO_STRING_INPUT_SEPARATOR)
+        .setAlign(Blockly.ALIGN_RIGHT);
+  },
+  typeblock: [{ translatedName: Blockly.Msg.LANG_LISTS_TO_STRING_TITLE_TO_STRING }]
+};
+
 Blockly.Blocks['lists_to_csv_row'] = {
   // Make a csv row from list.
   category : 'Lists',
