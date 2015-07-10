@@ -785,11 +785,14 @@ Blockly.Msg.zh_tw.switch_language_to_chinese_tw = {
     Blockly.Msg.LANG_LISTS_IS_LIST_INPUT_THING = '對象';
     Blockly.Msg.LANG_LISTS_IS_LIST_TOOLTIP = '判斷該對象是否為清單類型';
 
-    /*//needs translation
+    //needs translation
     Blockly.Msg.LANG_LISTS_TO_STRING_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/lists#listtocsvrow';
     Blockly.Msg.LANG_LISTS_TO_STRING_TITLE_TO_STRING = 'list to string';
     Blockly.Msg.LANG_LISTS_TO_STRING_INPUT_LIST = 'list';
-    Blockly.Msg.LANG_LISTS_TO_STRING_INPUT_SEPARATOR = 'separator'; */
+    Blockly.Msg.LANG_LISTS_TO_STRING_INPUT_SEPARATOR = 'separator';
+    Blockly.Msg.LANG_LISTS_TO_STRING_INPUT = 'list to string list %1 separator %2';
+    Blockly.Msg.LANG_LISTS_TO_STRING_TOOLTIP = 'Returns the string representation of the list, with the given '
+        + 'separator between elements.';
 
     Blockly.Msg.LANG_LISTS_TO_CSV_ROW_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/lists#listtocsvrow';
     Blockly.Msg.LANG_LISTS_TO_CSV_ROW_TITLE_TO_CSV = '清單轉CSV行';

@@ -1668,7 +1668,7 @@ Block name               Kawa implementation
 - remove list item        (yail-list-remove-item! yail-list index)
 - length of list          (yail-list-length yail-list)
 - copy list               (yail-list-copy list)
-- list to string          (yail-list-to-string list separator)
+- list to string          (yail-list-join-with-separator list separator)
 - list to csv row         (yail-list-to-csv-row list)
 - list to csv table       (yail-list-to-csv-table list)
 - list from csv row       (yail-list-from-csv-row text)
@@ -1772,25 +1772,30 @@ list, use the make-yail-list constructor with no arguments.
     (CsvUtil:toCsvTable (apply make-yail-list (map convert-to-strings (yail-list-contents yl))))))
 
 ;;; EMERY
-;;; converts a YailList, y1, to a string
-;;; each element is separated by s1
-;;; s2 is the initial empty string
-(define (convert-yail-list-to-string y1 s1 s2)
-    (if (yail-list-empty? y1)
-        s2
-        (convert-yail-list-to-string (cdr y1) s1 (string-append (string-append s2 (coerce-to-string (car y1))) s1))))
+;;; converts a YailList, ylist, to a string
+;;; each element is separated by sep
+;;; str is the initial empty string
+(define (convert-yail-list-to-string ylist sep str)
+        (if (null? ylist)
+          str
+          (if (null? (cdr ylist))
+            (convert-yail-list-to-string (cdr ylist) sep (string-append str (coerce-to-string (car ylist))))
+            (convert-yail-list-to-string (cdr ylist) sep (string-append str (coerce-to-string (car ylist)) sep)))))
 
 ;;; EMERY
 ;;; converts a yail list to a string with a separator between each element
-;;; y1 should be a YailList
-;;; s1 should be String
-(define (yail-list-to-string y1 s1)
-    (if (not (yail-list? y1))
-        (signal-runtime-error "Argument value to \"list to string\" must be a list" "Expecting list")
-        (if (not (string? s1))
-            (signal-runtime-error "Argument value to \"list to string\" must be a string" "Expecting string")
-            (convert-yail-list-to-string y1 s1 ""))))
-
+;;; ylist should be a YailList
+;;; sep should be a string
+(define (yail-list-join-with-separator ylist sep)
+    (begin
+        (android-log "LIST TO STRING")
+        (if (not (yail-list? ylist))
+            (signal-runtime-error "Argument value to \"list to string\" must be a list" "Expecting list")
+            (if (not (string? sep))
+                (signal-runtime-error "Argument value to \"list to string\" must be a string" "Expecting string")
+                (convert-yail-list-to-string (yail-list->kawa-list ylist) (coerce-to-string sep) "")))))
+             ;; let yail->kawa
+             ;; ask is it empty, atomic, 2 or more elements
 
 ;;; converts a yail list to a CSV-formatted row and returns the text.
 ;;; yl should be a YailList

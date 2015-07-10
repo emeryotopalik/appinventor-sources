@@ -356,14 +356,14 @@ Blockly.Blocks['lists_to_string'] = {
   init : function() {
     this.setColour(Blockly.LIST_CATEGORY_HUE);
     this.setOutput(true, Blockly.Blocks.Utilities.YailTypeToBlocklyType("text", Blockly.Blocks.Utilities.OUTPUT));
-    this.appendValueInput('LIST')
-        .setCheck(Blockly.Blocks.Utilities.YailTypeToBlocklyType("list", Blockly.Blocks.Utilities.INPUT))
-        .appendField(Blockly.Msg.LANG_LISTS_TO_STRING_TITLE_TO_STRING)
-        .appendField(Blockly.Msg.LANG_LISTS_TO_STRING_INPUT_LIST);
-    this.appendValueInput('SEPARATOR')
-        .setCheck(Blockly.Blocks.Utilities.YailTypeToBlocklyType("text", Blockly.Blocks.Utilities.INPUT))
-        .appendField(Blockly.Msg.LANG_LISTS_TO_STRING_INPUT_SEPARATOR)
-        .setAlign(Blockly.ALIGN_RIGHT);
+    var inputList = Blockly.Blocks.Utilities.YailTypeToBlocklyType("list", Blockly.Blocks.Utilities.INPUT);
+    var inputSeparator = Blockly.Blocks.Utilities.YailTypeToBlocklyType("text", Blockly.Blocks.Utilities.INPUT);
+    this.interpolateMsg(Blockly.Msg.LANG_LISTS_TO_STRING_INPUT,
+      ['LIST', inputList, Blockly.ALIGN_RIGHT],
+      ['SEPARATOR', inputSeparator, Blockly.ALIGN_RIGHT],
+      Blockly.ALIGN_RIGHT);
+    this.setTooltip(Blockly.Msg.LANG_LISTS_TO_STRING_TOOLTIP);
+    this.setInputsInline(false);
   },
   typeblock: [{ translatedName: Blockly.Msg.LANG_LISTS_TO_STRING_TITLE_TO_STRING }]
 };
