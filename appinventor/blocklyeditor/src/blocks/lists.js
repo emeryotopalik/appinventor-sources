@@ -368,6 +368,23 @@ Blockly.Blocks['lists_to_string'] = {
   typeblock: [{ translatedName: Blockly.Msg.LANG_LISTS_TO_STRING_TITLE_TO_STRING }]
 };
 
+Blockly.Blocks['list_from_JSON_string'] = {
+// Make list from JSON String.
+  category : 'Lists',
+  helpUrl : Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_HELPURL,
+  init : function() {
+    this.setColour(Blockly.LIST_CATEGORY_HUE);
+    this.setOutput(true, Blockly.Blocks.Utilities.YailTypeToBlocklyType("list",Blockly.Blocks.Utilities.OUTPUT));
+    this.appendValueInput('TEXT')
+        .setCheck(Blockly.Blocks.Utilities.YailTypeToBlocklyType("text",Blockly.Blocks.Utilities.INPUT))
+        .appendField(Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_TITLE)
+        .appendField(Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_INPUT_TEXT);
+    this.setTooltip(Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_TOOLTIP);
+  },
+  typeblock: [{ translatedName: Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_TITLE }]
+};
+
+
 Blockly.Blocks['lists_to_csv_row'] = {
   // Make a csv row from list.
   category : 'Lists',

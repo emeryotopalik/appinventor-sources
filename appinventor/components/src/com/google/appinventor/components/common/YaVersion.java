@@ -398,7 +398,7 @@ public class YaVersion {
   // The is-number block was modified to include dropdowns for base10, hex, and binary
   // The number-convert blocks was added
   // For BLOCKS_LANGUAGE_VERSION 20:
-  // The list-to-string block was added
+  // The list-to-string and list-from-json-string blocks were added
   public static final int BLOCKS_LANGUAGE_VERSION = 20;
   
   // ................................. Component Version Numbers ..................................

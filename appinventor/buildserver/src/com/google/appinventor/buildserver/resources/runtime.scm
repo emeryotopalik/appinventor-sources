@@ -787,6 +787,7 @@
 (module-name com.google.youngandroid.runtime)
 (module-static #t)
 
+(define-alias JsonUtil <com.google.appinventor.components.runtime.util.JsonUtil>)  ;;EMERY
 (define-alias CsvUtil <com.google.appinventor.components.runtime.util.CsvUtil>)
 (define-alias Double <java.lang.Double>)
 (define-alias Float <java.lang.Float>)
@@ -1669,6 +1670,7 @@ Block name               Kawa implementation
 - length of list          (yail-list-length yail-list)
 - copy list               (yail-list-copy list)
 - list to string          (yail-list-join-with-separator list separator)
+- json string to list     (yail-list-from-json-string yail-list)
 - list to csv row         (yail-list-to-csv-row list)
 - list to csv table       (yail-list-to-csv-table list)
 - list from csv row       (yail-list-from-csv-row text)
@@ -1790,12 +1792,30 @@ list, use the make-yail-list constructor with no arguments.
     (begin
         (android-log "LIST TO STRING")
         (if (not (yail-list? ylist))
-            (signal-runtime-error "Argument value to \"list to string\" must be a list" "Expecting list")
+            (signal-runtime-error "Argument value to \"list elements joined with separator\" must be a list" "Expecting list")
             (if (not (string? sep))
-                (signal-runtime-error "Argument value to \"list to string\" must be a string" "Expecting string")
+                (signal-runtime-error "Argument value to \"list elements joined with separator\" must be a text" "Expecting text")
                 (convert-yail-list-to-string (yail-list->kawa-list ylist) (coerce-to-string sep) "")))))
              ;; let yail->kawa
              ;; ask is it empty, atomic, 2 or more elements
+
+;;; EMERY
+;;(define (convert-json-string-to-list charlist ylist)
+  ;  (if (or (equal? (car charlist) "{") (equal? (car charlist) "}"))
+   ;     (signal-runtime-error "Argument value to \"list from JSON string\" contains an illegal character, \"{ or }\"" "Illegal character")
+    ;    (if (equal? (car charlist) "[")
+     ;       (
+
+;;; EMERY
+;(define (yail-list-from-json-string str)
+ ;   (let (coerced-string (coerce-to-string str))
+  ;      (if (string? coerced-string)
+   ;         (convert-json-string-to-list (string->list coerced-string))
+    ;        (signal-runtime-error "Argument value to \"list from JSON string\" must be a text" "Expecting text"))))
+
+(define (jsonlist arg)
+    (JsonUtil:getStringListFromJsonArray arg))
+
 
 ;;; converts a yail list to a CSV-formatted row and returns the text.
 ;;; yl should be a YailList

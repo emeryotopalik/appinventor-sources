@@ -780,6 +780,13 @@ Blockly.Msg.it_it.switch_language_to_italian = {
     Blockly.Msg.LANG_LISTS_TO_STRING_TOOLTIP = 'Returns the string representation of the list, with the given '
         + 'separator between elements.';
 
+    //needs translation
+    Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/lists#listfromcsvrow';
+    Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_TITLE = 'list from JSON string';
+    Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_INPUT_TEXT = 'text';
+    Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_TOOLTIP = 'Parses a text as a JSON formatted list '
+        + 'to produce list. It is an error for the text to contain curly braces instead of brackets.';
+
     Blockly.Msg.LANG_LISTS_TO_CSV_ROW_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/lists#listtocsvrow';
     Blockly.Msg.LANG_LISTS_TO_CSV_ROW_TITLE_TO_CSV = 'da lista a riga csv';
     Blockly.Msg.LANG_LISTS_TO_CSV_ROW_INPUT_LIST = 'lista';

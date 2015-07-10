@@ -1481,7 +1481,7 @@ Blockly.Versioning.AllUpgradeMaps =
     19: "noUpgrade",
 
     // AI2: In BLOCKS_LANGUAGE_VERSION 20
-    // Emery Otopalik's new List to String Block
+    // Emery Otopalik's new List to String Block and List From JSON String Block
     20: "noUpgrade"
 
   }, // End Language upgraders
