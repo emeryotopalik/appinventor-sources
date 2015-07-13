@@ -787,6 +787,7 @@
 (module-name com.google.youngandroid.runtime)
 (module-static #t)
 
+(define-alias ArrayList <java.util.ArrayList>)
 (define-alias JsonUtil <com.google.appinventor.components.runtime.util.JsonUtil>)  ;;EMERY
 (define-alias CsvUtil <com.google.appinventor.components.runtime.util.CsvUtil>)
 (define-alias Double <java.lang.Double>)
@@ -1800,21 +1801,30 @@ list, use the make-yail-list constructor with no arguments.
              ;; ask is it empty, atomic, 2 or more elements
 
 ;;; EMERY
-;;(define (convert-json-string-to-list charlist ylist)
-  ;  (if (or (equal? (car charlist) "{") (equal? (car charlist) "}"))
-   ;     (signal-runtime-error "Argument value to \"list from JSON string\" contains an illegal character, \"{ or }\"" "Illegal character")
-    ;    (if (equal? (car charlist) "[")
-     ;       (
+; (define (yail-list-from-json-string str)
+ ;   (arraylist-to-yaillist (JsonUtil:getObjectFromJson str) (make-yail-list) 0))
 
-;;; EMERY
-;(define (yail-list-from-json-string str)
- ;   (let (coerced-string (coerce-to-string str))
-  ;      (if (string? coerced-string)
-   ;         (convert-json-string-to-list (string->list coerced-string))
-    ;        (signal-runtime-error "Argument value to \"list from JSON string\" must be a text" "Expecting text"))))
+; (define (arraylist-to-yaillist arraylist yaillist count)
+ ;(begin
+  ;  (android-log count)
+   ; (if (= count (ArrayList:size arraylist))
+    ;    yaillist
+     ;   (begin
+      ;  (yail-list-add-to-list! yaillist (ArrayList:get arraylist count))
+       ; (arraylist-to-yaillist arraylist yaillist (+ 1 count))))))
 
-(define (jsonlist arg)
-    (JsonUtil:getStringListFromJsonArray arg))
+
+(define (yail-list-from-json-string str)
+    (let ((arr (JsonUtil:getObjectFromJson str)))
+        (apply make-yail-list (map (lambda (num) (ArrayList:get arr num)) (range-help (ArrayList:size arr) '())))))
+
+(define (range-help i lst)
+    (if (= i 0)
+        lst
+        (range-help (- i 1) (cons (- i 1) lst))))
+
+
+
 
 
 ;;; converts a yail list to a CSV-formatted row and returns the text.

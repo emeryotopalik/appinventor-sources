@@ -368,7 +368,7 @@ Blockly.Blocks['lists_to_string'] = {
   typeblock: [{ translatedName: Blockly.Msg.LANG_LISTS_TO_STRING_TITLE_TO_STRING }]
 };
 
-Blockly.Blocks['list_from_JSON_string'] = {
+Blockly.Blocks['lists_from_JSON_string'] = {
 // Make list from JSON String.
   category : 'Lists',
   helpUrl : Blockly.Msg.LANG_LISTS_FROM_JSON_STRING_HELPURL,
