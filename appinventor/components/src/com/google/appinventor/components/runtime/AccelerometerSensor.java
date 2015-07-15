@@ -23,6 +23,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -104,6 +105,8 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
 
   private Sensor accelerometerSensor;
 
+  private final Handler androidUIHandler;
+
   /**
    * Creates a new AccelerometerSensor component.
    *
@@ -115,6 +118,7 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
     form.registerForOnStop(this);
 
     enabled = true;
+    androidUIHandler = new Handler();
     sensorManager = (SensorManager) container.$context().getSystemService(Context.SENSOR_SERVICE);
     accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     startListening();
@@ -193,7 +197,7 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
    * Indicates the acceleration changed in the X, Y, and/or Z dimensions.
    */
   @SimpleEvent
-  public void AccelerationChanged(float xAccel, float yAccel, float zAccel) {
+  public void AccelerationChanged(final float xAccel, final float yAccel, final float zAccel) {
     this.xAccel = xAccel;
     this.yAccel = yAccel;
     this.zAccel = zAccel;
@@ -211,8 +215,11 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
       timeLastShook = currentTime;
       Shaking();
     }
-
-    EventDispatcher.dispatchEvent(this, "AccelerationChanged", xAccel, yAccel, zAccel);
+    androidUIHandler.post(new Runnable() {
+        public void run() {
+          EventDispatcher.dispatchEvent(AccelerometerSensor.this, "AccelerationChanged", xAccel, yAccel, zAccel);
+        }
+      });
   }
 
   /**
