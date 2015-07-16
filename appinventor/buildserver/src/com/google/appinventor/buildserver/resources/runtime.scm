@@ -386,9 +386,9 @@
          current-block-id)
 
        (define (set-current-block-id block-id)
-         (android-log-form (format #f "Before setting current-block-id to ~A its value is ~A and ~A" block-id current-block-id (get-current-block-id)))
+         ;(android-log-form (format #f "Before setting current-block-id to ~A its value is ~A and ~A" block-id current-block-id (get-current-block-id)))
          (set! current-block-id block-id)
-         (android-log-form (format #f "After setting current-block-id to ~A its value is ~A and ~A" block-id current-block-id (get-current-block-id)))
+        ; (android-log-form (format #f "After setting current-block-id to ~A its value is ~A and ~A" block-id current-block-id (get-current-block-id)))
          )
 
        ;; Keeps track of the last block that generated a runtime error
@@ -396,17 +396,18 @@
        ;; [12.3.13] johanna
        (define blocks-with-errors
           (list))
-       (android-log-form "BLOCKS WITH ERRORS")
+       ;(android-log-form "BLOCKS WITH ERRORS")
 
        (define (get-blocks-with-errors)
           blocks-with-errors)
 
        (define (add-to-blocks-with-errors block-id)
-            (android-log-form "Adding error")
-            (android-log-form blocks-with-errors)
+           ; (android-log-form "Adding error")
+            ;(android-log-form blocks-with-errors)
             (if (not (member block-id blocks-with-errors))
                 (set! blocks-with-errors (cons block-id blocks-with-errors)))
-            (android-log-form blocks-with-errors))
+            ;(android-log-form blocks-with-errors)
+            )
 
        ;; Johanna 1.7.14
        ;; Remove all instances of elt from list.
@@ -422,14 +423,15 @@
               (set! blocks-with-errors (remove block-id blocks-with-errors)))
 
        (define (remove-tuple block-id lst)
-        (android-log-form "remove-tuple")
-        (android-log-form block-id)
+       ; (android-log-form "remove-tuple")
+        ;(android-log-form block-id)
           (if  (null? lst)
           '()
           (if (equal? (car (car lst)) block-id)
-            (begin
-              (android-log-form (car (car lst)))
-              (remove-tuple block-id (cdr lst)))
+          ;  (begin
+         ;     (android-log-form (car (car lst)))
+              (remove-tuple block-id (cdr lst))
+              ;)
             (cons (car lst) (remove-tuple block-id (cdr lst))))
           ))
 
@@ -449,16 +451,16 @@
         ;; iterate through blocks-plus-errors.
         ;;
        (define (add-to-blocks-plus-errors block-id error lst) ;; only calls this once and never again b/c line below
-        (android-log-form "BLOCKS PLUS ERRORS")
+        ;(android-log-form "BLOCKS PLUS ERRORS")
         (let ((ans "-1"))
           (if (null? lst) ;; block-id not in list. First time error has been generated.
             (begin
               (set! blocks-plus-errors (cons (list block-id (list error) 1) blocks-plus-errors))
               (set! ans "newBlock")) ;; block has never had error before. send error to blocks editor
             (if (equal? (car (car lst)) block-id) ;; block has had error- check if same or new error.
-              (begin
-                (android-log-form "same block")
-                (android-log-form (cadr (car lst)))
+              ;(begin
+         ;       (android-log-form "same block")
+           ;     (android-log-form (cadr (car lst)))
                 (if (equal? (car (cadr (car lst))) error) ;; error is the same
                   (begin
                     (let ((count (caddr (car lst)))) ;; increment error count
@@ -467,11 +469,12 @@
                   (begin
                     (set! ans "newError")
                     (set! (car (cadr (car lst))) error) ;;set error and reset count to 1
-                    (set! (caddr (car lst)) 1))))
+                    (set! (caddr (car lst)) 1)))
+                    ;)
               (set! ans (add-to-blocks-plus-errors block-id error (cdr lst)))))
-          (android-log-form "blocks plus errors")
-          (android-log-form blocks-plus-errors)
-          (android-log-form ans)
+          ;(android-log-form "blocks plus errors")
+          ;(android-log-form blocks-plus-errors)
+          ;(android-log-form ans)
           ans))
 
        ;;(define (get-error-on-block block-id) ;; to be called in process-exception.
@@ -479,39 +482,42 @@
 
 
        (define (send-error error)
-          (android-log-form "SEND ERROR")
-          (android-log-form (better-message error))
-          (android-log-form "done")
+          ;(android-log-form "SEND ERROR")
+          ;(android-log-form (better-message error))
+         ; (android-log-form "done")
           (add-to-blocks-with-errors current-block-id)
-          (android-log-form blocks-plus-errors)
+         ; (android-log-form blocks-plus-errors)
           (let ((ans (add-to-blocks-plus-errors current-block-id error blocks-plus-errors)))
-            (android-log-form ans)
+          ;  (android-log-form ans)
             (if (or (equal? ans "newError") (equal? ans "newBlock")) ;;only send error to blocks editor if error is new
-              (begin
-                (android-log-form (format #f "(send-error '~A' ~A)" error current-block-id)) ;; [12/01/13, lyn]
-                (com.google.appinventor.components.runtime.util.RetValManager:sendError error current-block-id)) ;;johanna
+              ;(begin
+                ;(android-log-form (format #f "(send-error '~A' ~A)" error current-block-id)) ;; [12/01/13, lyn]
+                (com.google.appinventor.components.runtime.util.RetValManager:sendError error current-block-id);) ;;johanna
               (let ((count (cadr ans)))
                 (if (or (equal? count 50) (equal? (modulo count 100) 0)) ;; send if equal to 50 and multiples of 100.
                   (com.google.appinventor.components.runtime.util.RetValManager:sendError
                       (string-append error " (This error has occured " (number->string count) "+ times.)") current-block-id)
-                  (android-log-form "modulo no"))))))
+              ;    (android-log-form "modulo no")
+              )))))
 
           ;;(android-log-form (format #f "(send-error '~A' ~A)" error current-block-id)) ;; [12/01/13, lyn]
           ;;(com.google.appinventor.components.runtime.util.RetValManager:sendError error current-block-id)) ;;johanna
 
         (define (better-message error)
-          (android-log-form "BETTER MESSAGE")
-          (android-log-form error)
-          (android-log-form (substring error 0 13))
+         ; (android-log-form "BETTER MESSAGE")
+          ;(android-log-form error)
+         ; (android-log-form (substring error 0 13))
           (if (equal? (substring error 0 13) "The operation")
             (let ((op (substring error 14 15)))
-            (begin
-              (android-log-form "YES")
-              (android-log-form (substring error 14 15))
-              (android-log-form (equal? (substring error 14 15) "+"))
-              (string-append error (string-append (string-append ". " (string-append (string-append "\"" op) "\" "))  "requires two integers as input and at least one of yours is the wrong type."))))
+            ;(begin
+             ; (android-log-form "YES")
+              ;(android-log-form (substring error 14 15))
+              ;(android-log-form (equal? (substring error 14 15) "+"))
+              (string-append error (string-append (string-append ". " (string-append (string-append "\"" op) "\" "))  "requires two integers as input and at least one of yours is the wrong type."));)
+              )
 
-            (android-log-form "no")))
+           ; (android-log-form "no")
+            ))
 
 
        (define (is-quick-fire-event eventName)
@@ -525,15 +531,15 @@
          (define-alias YailRuntimeError <com.google.appinventor.components.runtime.errors.YailRuntimeError>)
          ;; The call below is a no-op unless we are in the wireless repl
          (com.google.appinventor.components.runtime.ReplApplication:reportError ex)
-         (android-log-form "PROCESS EXCEPTION")
-         (android-log-form ex)
+        ; (android-log-form "PROCESS EXCEPTION")
+        ; (android-log-form ex)
          (if isrepl
              (begin
-                (android-log-form get-blocks-with-errors)
-                (android-log-form blocks-with-errors)
-                (android-log-form current-block-id)
-                (android-log-form blocks-with-errors)
-                (android-log-form (member current-block-id blocks-with-errors))
+             ;   (android-log-form get-blocks-with-errors)
+              ;  (android-log-form blocks-with-errors)
+               ; (android-log-form current-block-id)
+                ;(android-log-form blocks-with-errors)
+                ;(android-log-form (member current-block-id blocks-with-errors))
                 ;;(if (not (member current-block-id blocks-with-errors))
                 ;;  (send-error (ex:getMessage)))
                 (send-error (ex:getMessage))
