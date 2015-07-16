@@ -1092,19 +1092,19 @@
 
 ;;; show a string that is the elements in arglist, with the individual
 ;;; elements delimited by brackets to make error messages more readable
-(define (show-arglist-no-parens args)
-  (let* ((elements (map get-display-representation args))
-         (bracketed (map (lambda (s) (string-append "[" s "]")) elements)))
-    (let loop ((result "") (rest-elements bracketed))
-      (if (null? rest-elements)
-          result
-          (loop (string-append result " " (car rest-elements))
-                (cdr rest-elements))))))
-
-
 ;;(define (show-arglist-no-parens args)
-;;  (let ((s (get-display-representation args)))
-;;    (substring s 1 (- (string-length s) 1))))
+  ;;(let* ((elements (map get-display-representation args))
+    ;;     (bracketed (map (lambda (s) (string-append "[" s "]")) elements)))
+   ;; (let loop ((result "") (rest-elements bracketed))
+     ;; (if (null? rest-elements)
+       ;;   result
+         ;; (loop (string-append result " " (car rest-elements))
+           ;;     (cdr rest-elements))))))
+
+
+(define (show-arglist-no-parens args)
+  (let ((s (get-display-representation args)))
+    (substring s 1 (- (string-length s) 1))))
 
 ;;; Coerce the list of args to the corresponding list of types
 
@@ -1197,8 +1197,8 @@
         ((boolean? arg) (boolean->string arg))
         ((yail-list? arg) (coerce-to-string (yail-list->kawa-list arg)))
         ((list? arg)
-         (let ((pieces (map coerce-to-string arg)))
-            (call-with-output-string (lambda (port) (display pieces port)))))
+             (let ((pieces (map get-display-representation arg)))
+                                      (string-append "[" (join-strings pieces ", ") "]")))
         (else (call-with-output-string (lambda (port) (display arg port))))))
 
 ;;; This is very similar to coerce-to-string, but is intended for places where we
@@ -1206,7 +1206,7 @@
 ;;; be explicity shown in error messages.
 ;;; This procedure is currently almost completely redundant with coerce-to-string
 ;;; but it give us flexibility to tailor display for other data types
-(define get-display-representation
+(define get-old-display-representation
   ;; there seems to be a bug in Kawa that makes (/ -1 0) equal to (/ 1 0)
   ;; which is why this uses 1.0 and -1.0
   (let ((+inf (/ 1.0 0))
@@ -1223,11 +1223,43 @@
                  arg))
             ((number? arg) (appinventor-number->string arg))
             ((boolean? arg) (boolean->string arg))
+            ((yail-list? arg) (get-old-display-representation (yail-list->kawa-list arg)))
+            ((list? arg)
+             (let ((pieces (map get-old-display-representation arg)))
+               (call-with-output-string (lambda (port) (display pieces port)))))
+            (else (call-with-output-string (lambda (port) (display arg port))))))))
+
+(define get-display-representation
+  ;; there seems to be a bug in Kawa that makes (/ -1 0) equal to (/ 1 0)
+  ;; which is why this uses 1.0 and -1.0
+  (let ((+inf (/ 1.0 0))
+        (-inf (/ -1.0 0)))
+    (lambda (arg)
+      (cond ((= arg +inf) "+infinity")
+            ((= arg -inf) "-infinity")
+            ((eq? arg *the-null-value*) *the-null-value-printed-rep*)
+            ((symbol? arg)
+             (symbol->string arg))
+            ((string? arg) (string-append "\"" arg "\""))
+            ((number? arg) (appinventor-number->string arg))
+            ((boolean? arg) (boolean->string arg))
             ((yail-list? arg) (get-display-representation (yail-list->kawa-list arg)))
             ((list? arg)
              (let ((pieces (map get-display-representation arg)))
-               (call-with-output-string (lambda (port) (display pieces port)))))
+                (string-append "[" (join-strings pieces ", ") "]")))
             (else (call-with-output-string (lambda (port) (display arg port))))))))
+
+(define (join-strings strings separator)
+   (cond ((null? strings) "")
+         ((null? (cdr strings)) (car strings))
+         (else ;; have at least two strings
+           (apply string-append
+                  (cons (car strings)
+                        (let recur ((strs (cdr strings)))
+                          (if (null? strs)
+                              '()
+                              (cons separator (cons (car strs) (recur (cdr strs)))))))))))
+
 
 ;; Note: This is not general substring replacement. It just replaces one string with another
 ;; using the replacement table
@@ -1670,7 +1702,6 @@ Block name               Kawa implementation
 - remove list item        (yail-list-remove-item! yail-list index)
 - length of list          (yail-list-length yail-list)
 - copy list               (yail-list-copy list)
-- list to string          (yail-list-join-with-separator list separator)
 - json string to list     (yail-list-from-json-string yail-list)
 - list to csv row         (yail-list-to-csv-row list)
 - list to csv table       (yail-list-to-csv-table list)
@@ -1775,57 +1806,20 @@ list, use the make-yail-list constructor with no arguments.
     (CsvUtil:toCsvTable (apply make-yail-list (map convert-to-strings (yail-list-contents yl))))))
 
 ;;; EMERY
-;;; converts a YailList, ylist, to a string
-;;; each element is separated by sep
-;;; str is the initial empty string
-(define (convert-yail-list-to-string ylist sep str)
-        (if (null? ylist)
-          str
-          (if (null? (cdr ylist))
-            (convert-yail-list-to-string (cdr ylist) sep (string-append str (coerce-to-string (car ylist))))
-            (convert-yail-list-to-string (cdr ylist) sep (string-append str (coerce-to-string (car ylist)) sep)))))
-
-;;; EMERY
-;;; converts a yail list to a string with a separator between each element
-;;; ylist should be a YailList
-;;; sep should be a string
-(define (yail-list-join-with-separator ylist sep)
-    (begin
-        (android-log "LIST TO STRING")
-        (if (not (yail-list? ylist))
-            (signal-runtime-error "Argument value to \"list elements joined with separator\" must be a list" "Expecting list")
-            (if (not (string? sep))
-                (signal-runtime-error "Argument value to \"list elements joined with separator\" must be a text" "Expecting text")
-                (convert-yail-list-to-string (yail-list->kawa-list ylist) (coerce-to-string sep) "")))))
-             ;; let yail->kawa
-             ;; ask is it empty, atomic, 2 or more elements
-
-;;; EMERY
-; (define (yail-list-from-json-string str)
- ;   (arraylist-to-yaillist (JsonUtil:getObjectFromJson str) (make-yail-list) 0))
-
-; (define (arraylist-to-yaillist arraylist yaillist count)
- ;(begin
-  ;  (android-log count)
-   ; (if (= count (ArrayList:size arraylist))
-    ;    yaillist
-     ;   (begin
-      ;  (yail-list-add-to-list! yaillist (ArrayList:get arraylist count))
-       ; (arraylist-to-yaillist arraylist yaillist (+ 1 count))))))
-
-
 (define (yail-list-from-json-string str)
-    (let ((arr (JsonUtil:getObjectFromJson str)))
-        (apply make-yail-list (map (lambda (num) (ArrayList:get arr num)) (range-help (ArrayList:size arr) '())))))
+(if (string? str)
+    (try-catch
+        (let ((arr (JsonUtil:getObjectFromJson str)))
+            (apply make-yail-list (map (lambda (num) (ArrayList:get arr num)) (range-help (ArrayList:size arr) '()))))
+        (exception java.lang.Exception
+            (signal-runtime-error "Cannot parse text argument to  \"list from JSON string\" as a JSON-formatted array"
+                (exception:getMessage))))
+    (signal-runtime-error "Cannot parse text argument to  \"list from JSON string\" as a JSON-formatted array" "Expecting text")))
 
 (define (range-help i lst)
     (if (= i 0)
         lst
         (range-help (- i 1) (cons (- i 1) lst))))
-
-
-
-
 
 ;;; converts a yail list to a CSV-formatted row and returns the text.
 ;;; yl should be a YailList
@@ -2171,6 +2165,21 @@ list, use the make-yail-list constructor with no arguments.
 ;;;;Text implementation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;; EMERY
+(define (yail-list-join-with-separator ylist sep)
+        (if (not (yail-list? ylist))
+            (signal-runtime-error "Argument value to \"list join\" must be a list" "Expecting list")
+            (if (not (string? sep))
+                (signal-runtime-error "Argument value to \"list join\" must be a text" "Expecting text")
+                (convert-yail-list-to-string (yail-list->kawa-list ylist) (coerce-to-string sep) ""))))
+
+;;; EMERY
+(define (convert-yail-list-to-string ylist sep str)
+        (if (null? ylist)
+          str
+          (if (null? (cdr ylist))
+            (convert-yail-list-to-string (cdr ylist) sep (string-append str (coerce-to-string (car ylist))))
+            (convert-yail-list-to-string (cdr ylist) sep (string-append str (coerce-to-string (car ylist)) sep)))))
 
 (define (make-disjunct x)
   (cond ((null? (cdr x)) (Pattern:quote (car x)))

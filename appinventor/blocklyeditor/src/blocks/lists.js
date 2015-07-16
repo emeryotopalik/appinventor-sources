@@ -349,24 +349,6 @@ Blockly.Blocks['lists_is_list'] = {
   typeblock: [{ translatedName: Blockly.Msg.LANG_LISTS_IS_LIST_TITLE_IS_LIST }]
 };
 
-Blockly.Blocks['lists_to_string'] = {
-  // Make a string from lists with separator between elements
-  category : 'Lists',
-  helpUrl : Blockly.Msg.LANG_LISTS_TO_STRING_HELPURL,
-  init : function() {
-    this.setColour(Blockly.LIST_CATEGORY_HUE);
-    this.setOutput(true, Blockly.Blocks.Utilities.YailTypeToBlocklyType("text", Blockly.Blocks.Utilities.OUTPUT));
-    var inputList = Blockly.Blocks.Utilities.YailTypeToBlocklyType("list", Blockly.Blocks.Utilities.INPUT);
-    var inputSeparator = Blockly.Blocks.Utilities.YailTypeToBlocklyType("text", Blockly.Blocks.Utilities.INPUT);
-    this.interpolateMsg(Blockly.Msg.LANG_LISTS_TO_STRING_INPUT,
-      ['LIST', inputList, Blockly.ALIGN_RIGHT],
-      ['SEPARATOR', inputSeparator, Blockly.ALIGN_RIGHT],
-      Blockly.ALIGN_RIGHT);
-    this.setTooltip(Blockly.Msg.LANG_LISTS_TO_STRING_TOOLTIP);
-    this.setInputsInline(false);
-  },
-  typeblock: [{ translatedName: Blockly.Msg.LANG_LISTS_TO_STRING_TITLE_TO_STRING }]
-};
 
 Blockly.Blocks['lists_from_JSON_string'] = {
 // Make list from JSON String.
