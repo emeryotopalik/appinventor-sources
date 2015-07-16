@@ -2606,9 +2606,9 @@ list, use the make-yail-list constructor with no arguments.
 (define-syntax augment
     (syntax-rules()
       ((_ info exp)
-       (begin
-         (android-log (format #f "Evaluating: (augment ~A ~S)" info (quote exp)))
-         (android-log (format #f "last block with error ~A" (*:get-blocks-with-errors *this-form* )))
+      ; (begin
+       ;  (android-log (format #f "Evaluating: (augment ~A ~S)" info (quote exp)))
+        ; (android-log (format #f "last block with error ~A" (*:get-blocks-with-errors *this-form* )))
           ;;(if (= info (*:get-last-block-with-error *this-form*))) ;; johanna [12.5.13] attempt to make errors disappear
                        ;;Print out what this is down below and see
           ;;(if (member info (*:get-last-block-with-error *this-form*))
@@ -2625,7 +2625,9 @@ list, use the make-yail-list constructor with no arguments.
           (let ((ans (with-current-block-id info (lambda () exp))))
               (android-log (format #f "Result is ~S for id ~S and expression ~S" ans info (quote exp)))
               (after-execution info)
-              ans)))))
+              ans)
+              ;)
+              )))
               ;;(with-current-block-id info (lambda () exp))))))) ;; use let to get value of exp and then remove error if gets to that point
 
 
@@ -2635,8 +2637,9 @@ list, use the make-yail-list constructor with no arguments.
            (send-to-block block-id (list "OK" "noError"))
            (*:remove-from-last-block-with-error *this-form* block-id)
            (*:remove-from-errors *this-form* block-id)
-           (android-log (*:get-blocks-with-errors *this-form*))
-           (android-log "ERROR OK")))
+           ;(android-log (*:get-blocks-with-errors *this-form*))
+           ;(android-log "ERROR OK")
+           ))
   )
 
 ;; (define (augment-proc info thunk)
