@@ -28,7 +28,7 @@ goog.require('goog.crypt.Sha1');
 goog.require('goog.crypt.Hmac');
 goog.require('goog.crypt.base64');
 
-//top.loadAll = true;             // Global for debugging!
+top.loadAll = true;             // Global for debugging!
 
 // Repl State
 // Repl "state" definitions
@@ -248,7 +248,7 @@ Blockly.ReplMgr.putYail = (function() {
             if (!phonereceiving) {
                 engine.receivefromphone();
             }
-        /*    var work;
+            var work;
             if (top.loadAll) {
                 var chunk;
                 var allcode = "";
@@ -286,11 +286,6 @@ Blockly.ReplMgr.putYail = (function() {
                     rs.phoneState.ioRunning = false;
                     return;
                 }
-            }  */
-            var work = rs.phoneState.phoneQueue.shift();
-            if (!work) {
-                rs.phoneState.ioRunning = false;
-                return;
             }
             var encoder = new goog.Uri.QueryData();
             conn = goog.net.XmlHttp();
