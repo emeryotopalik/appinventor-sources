@@ -160,6 +160,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
         getForm().fireComponentRenamed(MockComponent.this, oldName);
       } else {
         newNameTextBox.setFocus(true);
+        newNameTextBox.selectAll();
       }
     }
 
@@ -202,6 +203,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
         @Override
         public void execute() {
           newNameTextBox.setFocus(true);
+          newNameTextBox.selectAll();
         }
       });
     }
@@ -381,7 +383,9 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
    * Returns a unique default component name.
    */
   private String componentName() {
-    return TranslationDesignerPallete.getCorrespondingString(getType()) + getNextComponentIndex();
+    String compType = TranslationDesignerPallete.getCorrespondingString(getType());
+    compType = compType.replace(" ", "_").replace("'", "_"); // Make sure it doesn't have any spaces in it
+    return compType + getNextComponentIndex();
   }
 
   /**
@@ -402,7 +406,10 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   private int getNextComponentIndex() {
     int highIndex = 0;
     if (editor != null) {
-      final String typeName = TranslationDesignerPallete.getCorrespondingString(getType()).toLowerCase();
+      final String typeName = TranslationDesignerPallete.getCorrespondingString(getType())
+        .toLowerCase()
+        .replace(" ", "_")
+        .replace("'", "_");
       final int nameLength = typeName.length();
       for (String cName : editor.getComponentNames()) {
         cName = cName.toLowerCase();

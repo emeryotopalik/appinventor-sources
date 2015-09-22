@@ -111,11 +111,16 @@
   <!-- Simplified Chinese -->
  <!-- <extend-property name="locale" values="zh_CN"/>  -->
   <!-- Traditional Chinese -->
- <!--<extend-property name="locale" values="zh_TW"/> -->
- <!-- Spanish from Spain -->
- <!-- <extend-property name="locale" values="es_ES"/>  -->
-  <!-- Italian -->
- <!-- <extend-property name="locale" values="it_IT"/> -->
-  <set-property-fallback name="locale" value="en"/>
+    <!-- <extend-property name="locale" values="zh_TW"/>  -->
+     <!-- Spanish from Spain -->
+    <!-- <extend-property name="locale" values="es_ES"/>   -->
+     <!-- French -->
+    <!-- <extend-property name="locale" values="fr_FR"/>   -->
+     <!-- Italian -->
+    <!-- <extend-property name="locale" values="it_IT"/>   -->
+     <!-- Russian -->
+    <!--<extend-property name="locale" values="ru"/>   -->
 
-</module>
+    <set-property-fallback name="locale" value="en"/>
+
+  </module>
