@@ -615,7 +615,7 @@ Blockly.Yail.blockToCode1 = function(block) {
 
 // [emery, lyn 10/02/15] Added watch tag with block id.
 // The following code is necessary to determine if a block is being watched.
-// start
+// This is an overried to Blockly.Generator.blockToCode for the "watch" case
 Blockly.Yail.blockToCode = function(block) {
   if (!block) {
     return '';
