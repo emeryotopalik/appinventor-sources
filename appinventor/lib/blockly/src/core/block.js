@@ -2037,9 +2037,9 @@ Blockly.Block.prototype.setCommentText = function(text) {
   var changedState = false;
   if (goog.isString(text)) {
     if (!this.comment) {
-     // this.comment = new Blockly.Comment(this);
+      this.comment = new Blockly.Comment(this);
       // [emery, 06/15] changed so that comments are deferred to TextBubbles (glorified Comments)
-      this.comment = new Blockly.TextBubble(this, Blockly.BlocklyEditor.commentChar);
+      //this.comment = new Blockly.TextBubble(this, Blockly.BlocklyEditor.commentChar);
       changedState = true;
     }
     this.comment.setText(/** @type {string} */ (text));

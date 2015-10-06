@@ -157,6 +157,7 @@ Blockly.Generator.prototype.blockToCode = function(block) {
   if (goog.isArray(code)) {
     // Value blocks return tuples of code and operator order.
     return [this.scrub_(block, code[0]), code[1]];
+    // end
   } else if (goog.isString(code)) {
     if (this.STATEMENT_PREFIX) {
       code = this.STATEMENT_PREFIX.replace(/%1/g, '\'' + block.id + '\'') +

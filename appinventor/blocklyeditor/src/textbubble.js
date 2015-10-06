@@ -15,7 +15,7 @@ goog.provide('Blockly.TextBubble');
 goog.require('Blockly.Bubble');
 goog.require('Blockly.Icon');
 goog.require('goog.userAgent');
-
+goog.require('Blockly.Comment');
 
 /**
  * Class for a textbubble.
@@ -34,7 +34,12 @@ Blockly.TextBubble = function(block, opt_iconChar) {
     Blockly.TextBubble.superClass_.constructor.call(this, block);
     this.createIcon_();
 };
+
+Blockly.Comment = function(block) {
+    return new Blockly.TextBubble(block, Blockly.BlocklyEditor.commentChar);
+};
 goog.inherits(Blockly.TextBubble, Blockly.Icon);
+
 
 
 /**
@@ -396,6 +401,10 @@ Blockly.TextBubble.prototype.setText = function(text) {
     } else {
         this.text_ = text;
     }
+};
+
+Blockly.Comment.prototype.setText = function(text) {
+    Blockly.TextBubble.prototype.setText(text);
 };
 
 /**
