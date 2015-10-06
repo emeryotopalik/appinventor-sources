@@ -612,3 +612,20 @@ Blockly.Yail.blockToCode1 = function(block) {
     return this.scrub_(block, code, true);
   }
 };
+
+// [emery, lyn 10/02/15] Added watch tag with block id.
+// The following code is necessary to determine if a block is being watched.
+// start
+Blockly.Yail.blockToCode = function(block) {
+  if (!block) {
+    return '';
+  }
+  var code = Blockly.Generator.prototype.blockToCode.call(Blockly.Yail, block);
+  if (block.watch) {
+    var generatedCode = code[0];
+    generatedCode = " (watch " + block.id + " " + generatedCode + ")";
+    return [this.scrub_(block, generatedCode), code[1]];
+  } else {
+    return code;
+  }
+};

@@ -156,18 +156,7 @@ Blockly.Generator.prototype.blockToCode = function(block) {
   var code = func.call(block, block);
   if (goog.isArray(code)) {
     // Value blocks return tuples of code and operator order.
-
-    // old code
-   // return [this.scrub_(block, code[0]), code[1]];
-
-    // [emery, 6/18/15] Added watch tag with block id.
-    // The following code is necessary to determine if a block is being watched.
-    // start
-    var generatedCode = code[0];
-    if (block.watch) {
-      generatedCode = " (watch " + block.id + " " + generatedCode + ")";
-    }
-    return [this.scrub_(block, generatedCode), code[1]];
+    return [this.scrub_(block, code[0]), code[1]];
     // end
   } else if (goog.isString(code)) {
     if (this.STATEMENT_PREFIX) {
