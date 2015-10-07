@@ -234,9 +234,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
        var yailText;
        var yailTextOrArray = Blockly.Yail.blockToCode(myBlock);
        var dialog;
-       console.log("blocklyeditor");
        if (window.parent.ReplState.state != Blockly.ReplMgr.rsState.CONNECTED) {
-         console.log("blocklyeditor1");
          dialog = new goog.ui.Dialog(null, true);
          dialog.setTitle(Blockly.Msg.CAN_NOT_WATCH);
          dialog.setContent(Blockly.Msg.CONNECT_TO_WATCH);
@@ -244,13 +242,10 @@ Blockly.Block.prototype.customContextMenu = function(options) {
              addButton(goog.ui.Dialog.ButtonSet.DefaultButtons.OK,
              false, true));
          dialog.setVisible(true);
-         console.log("blocklyeditor2");
        } else {
          if (yailTextOrArray instanceof Array) {
-           console.log("blocklyeditor3");
            yailText = yailTextOrArray[0];
          } else {
-           console.log("blocklyeditor4");
            yailText = yailTextOrArray;
          }
          // watch originated from doit, so the initial return value will be a doit.
@@ -259,9 +254,7 @@ Blockly.Block.prototype.customContextMenu = function(options) {
          myBlock.watch = true;
          // set a blank watch bubble. without this, you have to wait until the first value for the bubble to appear
          Blockly.TextBubble.prototype.setTextBubbleText(myBlock, Blockly.BlocklyEditor.watchChar, '');
-         console.log("blocklyeditor5");
          Blockly.ReplMgr.putYail(yailText, myBlock);
-         console.log("blocklyeditor6");
        }
      };
      options.push(watchOption);

@@ -622,10 +622,8 @@ Blockly.Yail.blockToCode = function(block) {
   }
   var code = Blockly.Generator.prototype.blockToCode.call(Blockly.Yail, block);
   if (block.watch) {
-    console.log("here");
     var generatedCode = code[0];
     generatedCode = " (watch " + block.id + " " + generatedCode + ")";
-    console.log("nope");
     return [this.scrub_(block, generatedCode), code[1]];
   } else {
     return code;
